@@ -18,8 +18,10 @@
 <img src="https://img.shields.io/badge/Bootstrap-7952B3?style=flat-square&logo=Bootstrap&logoColor=white"/>
 
 </div>
+
 #### ERD
-| Still workign on it !!
+| Still workign on it
+
 ![erd](assets/CultureSupply_ERD.png)
 
 #### StoryBoard
