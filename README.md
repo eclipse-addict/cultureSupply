@@ -19,13 +19,13 @@
 
 </div>
 
-#### ERD
+### ERD
 | Still workign on it
 
 ![erd](assets/CultureSupply_ERD.png)
 
-#### StoryBoard
+### StoryBoard
 
 
-#### Django Modeling
+### Django Modeling
  
