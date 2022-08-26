@@ -11,17 +11,33 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-import os   # 👈🏻 경로 설정을 위해 os 라이브러리를 import  
+from django.core.exceptions import ImproperlyConfigured
+import os, json   
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+secret_file = os.path.join(BASE_DIR, 'secrets.json')  # secrets.json 파일 위치를 명시
+
+secret_file = os.path.join(BASE_DIR, 'secrets.json')  # secrets.json 파일 위치
+
+# secret_file 열고
+with open(secret_file) as file: 
+    secrets = json.loads(file.read())
+
+def get_secret(setting):
+    try:
+        return secrets[setting] # [key] 이름으로 value를 반환. 
+    except KeyError:
+        error_msg = "No such key : {} ".format(setting) # json 에 해당 키값이 없음.
+        raise ImproperlyConfigured(error_msg)
+
+SECRET_KEY = get_secret("SECRET_KEY")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%y35pj2dnw2vpw3@gcxk2e62_=pfy*^pu7l$k%&h_ni)g7j@p)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
