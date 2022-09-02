@@ -22,7 +22,8 @@
 <div>
 <h4>TODO :</h4>
 <ul>
-  <li>fixing ERD</li>
+  <li>model form </li>
+  <li>django template CRUD</li>
   <li>make nav, footer, main header using bootstrap</li>
   <li>accounts model </li>
   <li>basic enrollment, login and out</li>

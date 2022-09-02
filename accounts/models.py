@@ -6,6 +6,7 @@ class User(AbstractUser):
     # nessary for registration
     email = models.EmailField(verbose_name='email')
     gender = models.SmallIntegerField(null=True, blank=True)
+    phoneNumber = models.CharField(max_length=11)
     
     # Optional fields
     topSize = models.SmallIntegerField(null=True)

@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -22,4 +24,5 @@ urlpatterns = [
     path('articles/', include('articles.urls')),
     path('sneakers/', include('sneakers.urls')),
     path('raffleInfos', include('raffleInfos.urls')),
-]
+    # path('', include('com.urls')),  app which contains only the main page    
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
