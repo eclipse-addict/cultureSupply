@@ -7,5 +7,11 @@ class CustomedUserCreateForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
 
         model = get_user_model()
-        fields = UserCreationForm.Meta.fields 
-        # fields = UserCreationForm.Meta.fields + ('email',)
+        # fields = UserCreationForm.Meta.fields 
+        fields = UserCreationForm.Meta.fields + ('email', 
+                                                 'gender', 
+                                                 'phoneNumber', 
+                                                 'topSize',
+                                                 'shoeSize',
+                                                 'bottomSize',
+                                                 )
