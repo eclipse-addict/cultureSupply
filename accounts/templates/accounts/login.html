@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+
+{% block content %}
+<main class="form-signin w-100 m-auto">
+  <div class="container">
+    <form action="{% url 'accounts:login' %}" method="post">
+      {%bootstrap_form form%}
+      {% csrf_token %}
+      <div class="text-center">
+        <input type="submit" value="Log in">
+        <button>
+          <a href="{% url 'accounts:signup' %}">Sign up</a>
+        </button>
+        <button>
+          <a href="{% url 'sneakers:index' %}">Back</a>
+        </button>
+      </div>
+    </div>
+  </form>
+  </div>
+</main>
+  
+  
+{% endblock content %}

@@ -9,9 +9,11 @@ class CustomedUserCreateForm(UserCreationForm):
         model = get_user_model()
         # fields = UserCreationForm.Meta.fields 
         fields = UserCreationForm.Meta.fields + ('email', 
-                                                 'gender', 
+                                                 'first_name',
+                                                 'last_name',
                                                  'phoneNumber', 
-                                                 'topSize',
+                                                 'gender', 
                                                  'shoeSize',
+                                                 'topSize',
                                                  'bottomSize',
                                                  )
