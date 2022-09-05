@@ -9,20 +9,24 @@
     <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Culture Supply</h5>
+
         <div style="padding-left: 10px;" class="text-center ">
           {% if request.user.is_authenticated %}
           <form action="{% url 'accounts:logout' %}" method="post" >
+            <a href="" class="text-decoration-none">
+              <span style="margin-right: 10px">{{request.user}}</span>
+            </a>
             {% csrf_token %}
             <input type="submit" value="logout" class = "loginoutBtn">
           </form>
           {% else %}
-            <button class="btn btn-sm btn-outline-secondary" type="button"><a href="{% url 'accounts:login' %}" class="text-decoration-none text-black">Login</a> </button>
-            <button class="btn btn-sm btn-outline-secondary" type="button"><a href="{% url 'accounts:signup' %}" class="text-decoration-none text-black">Sign Up</a> </button>
+          <button class="btn btn-sm btn-outline-secondary" type="button"><a href="{% url 'accounts:login' %}" class="text-decoration-none text-black">Login</a> </button>
+          <button class="btn btn-sm btn-outline-secondary" type="button"><a href="{% url 'accounts:signup' %}" class="text-decoration-none text-black">Sign Up</a> </button>
           {% endif %}
         </div>
         <form class=" justify-content-start-100 justify-content-start ">
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
       <div class="offcanvas-body">
         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
           <li class="nav-item">
