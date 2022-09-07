@@ -17,3 +17,14 @@ class CustomedUserCreateForm(UserCreationForm):
                                                  'topSize',
                                                  'bottomSize',
                                                  )
+
+class CustomedUserUpdateForm(UserChangeForm):
+    
+    class Meta(UserChangeForm.Meta):
+        model = get_user_model()
+        fields = ('email', 
+                  'first_name',
+                  'last_name',
+                  'shoeSize',
+                  'topSize',
+                  'bottomSize',)

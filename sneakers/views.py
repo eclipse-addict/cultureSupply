@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from .models import Sneaker
 from .forms import SneakerForm
 
@@ -11,7 +12,7 @@ def index(request):
         'sneakers': sneakers,
     }
     return render(request, 'sneakers/index.html', context=context)
-
+@login_required
 def create(request):
     if request.method == 'POST':
         form = SneakerForm(request.POST, request.FILES)

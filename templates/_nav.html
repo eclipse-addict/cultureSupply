@@ -13,7 +13,7 @@
         <div style="padding-left: 10px;" class="text-center ">
           {% if request.user.is_authenticated %}
           <form action="{% url 'accounts:logout' %}" method="post" >
-            <a href="" class="text-decoration-none">
+            <a href="{% url 'accounts:userUpdate' %}" class="text-decoration-none">
               <span style="margin-right: 10px">{{request.user}}</span>
             </a>
             {% csrf_token %}
