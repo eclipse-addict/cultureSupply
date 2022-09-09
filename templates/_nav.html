@@ -1,7 +1,9 @@
 {% load static %}
 <nav class="navbar navbar-dark bg-dark sticky-top mb-5">
   <div class="container-fluid">
-    <img class="main-logo" src="{% static 'cslogo.png' %}" alt="">
+    <a href="{% url 'sneakers:index' %}">
+      <img class="main-logo" src="{% static 'cslogo.png' %}" alt="">
+    </a>
     <a class="navbar-brand ps-0 font-weight-bold navTitle" href="{% url 'sneakers:index' %}">Culture Supply</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
       <span class="navbar-toggler-icon"></span>
