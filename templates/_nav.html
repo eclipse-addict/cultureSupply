@@ -10,13 +10,17 @@
     </button>
     <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
       <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Culture Supply</h5>
+        <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">
+        <a href="{% url 'sneakers:index' %}" class="text-decoration-none text-dark">
+          Culture Supply
+        </a>
+        </h5>
 
         <div style="padding-left: 10px;" class="text-center ">
           {% if request.user.is_authenticated %}
           <form action="{% url 'accounts:logout' %}" method="post" >
             <a href="{% url 'accounts:userUpdate' %}" class="text-decoration-none">
-              <span style="margin-right: 10px">{{request.user}}</span>
+              <span style="margin-right: 10px">My Info</span>
             </a>
             {% csrf_token %}
             <input type="submit" value="logout" class = "loginoutBtn">
@@ -32,29 +36,31 @@
       <div class="offcanvas-body">
         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
           <li class="nav-item">
-            <a class="nav-link active text-dark" aria-current="page" href="#">Home</a>
+            <a class="nav-link active text-dark" aria-current="page" href="{% url 'sneakers:index' %}">Sneakers</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-dark" href="#">Link</a>
+            <a class="nav-link active text-dark" aria-current="page" href="#">Music</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="{% url 'articles:index' %}">Community</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Dropdown
+              Raffles
             </a>
             <ul class="dropdown-menu dropdown-menu-dark">
-              <li><a class="dropdown-item" href="#">Action</a></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item" href="#">Domestic</a></li>
+              <li><a class="dropdown-item" href="#">International</a></li>
               <li>
                 <hr class="dropdown-divider">
               </li>
-              <li><a class="dropdown-item" href="#">Something else here</a></li>
+              <li><a class="dropdown-item" href="#">My Raffle History </a></li>
             </ul>
           </li>
+          <li>
+            <a class="nav-link active text-black-50 text-center" aria-current="page" href="#">About Culture Supply</a>
+          </li>
         </ul>
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-success" type="submit">Search</button>
-        </form>
       </div>
     </div>
   </div>
