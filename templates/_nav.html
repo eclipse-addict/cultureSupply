@@ -18,13 +18,23 @@
 
         <div style="padding-left: 10px;" class="text-center ">
           {% if request.user.is_authenticated %}
-          <form action="{% url 'accounts:logout' %}" method="post" >
-            <a href="{% url 'accounts:userUpdate' %}" class="text-decoration-none">
-              <span style="margin-right: 10px"><button class="btn btn-outline-secondary">My Info</button></span>
+          <div class="dropdown">
+            <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+              <strong>mdo</strong>
             </a>
-            {% csrf_token %}
-            <input type="submit" value="logout" class = "loginoutBtn">
-          </form>
+            <ul class="dropdown-menu text-small shadow">
+              <li><a class="dropdown-item" href="#">New project...</a></li>
+              <li><a class="dropdown-item" href="#">Settings</a></li>
+              <li><a class="dropdown-item" href="{% url 'accounts:userUpdate' %}">Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">Sign out</a></li>
+            </ul>
+            <form action="{% url 'accounts:logout' %}" method="post" >
+              {% csrf_token %}
+              <input type="submit" value="logout" class = "loginoutBtn">
+            </form>
+          </div>
           {% else %}
           <button class="btn btn-sm btn-outline-secondary" type="button"><a href="{% url 'accounts:login' %}" class="text-decoration-none text-black">Login</a> </button>
           <button class="btn btn-sm btn-outline-secondary" type="button"><a href="{% url 'accounts:signup' %}" class="text-decoration-none text-black">Sign Up</a> </button>
@@ -65,6 +75,9 @@
     </div>
   </div>
 </nav>
+<hr>
+
+
 
 <!-- login Modal -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
