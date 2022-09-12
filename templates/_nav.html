@@ -20,7 +20,7 @@
           {% if request.user.is_authenticated %}
           <form action="{% url 'accounts:logout' %}" method="post" >
             <a href="{% url 'accounts:userUpdate' %}" class="text-decoration-none">
-              <span style="margin-right: 10px">My Info</span>
+              <span style="margin-right: 10px"><button class="btn btn-outline-secondary">My Info</button></span>
             </a>
             {% csrf_token %}
             <input type="submit" value="logout" class = "loginoutBtn">
