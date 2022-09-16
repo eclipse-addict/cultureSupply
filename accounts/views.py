@@ -18,7 +18,7 @@ def login(request):
         form = AuthenticationForm(request, request.POST)
         if form.is_valid():
             auth_login(request, form.get_user()) 
-            return redirect(request.GET.get('next') or 'articles:index')
+            return redirect(request.GET.get('next') or 'sneakers:index')
     else:
         form = AuthenticationForm()
     context = {
@@ -39,7 +39,7 @@ def signup(request):
 @require_http_methods(['GET', 'POST'])
 def register(request):
     if request.method == 'POST': # sign up
-        form = CustomedUserCreateForm(request.POST)
+        form = CustomedUserCreateForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
@@ -63,7 +63,7 @@ def userDelete(request):
 @require_http_methods(['GET', 'POST'])
 def userUpdate(request):
     if request.method == 'POST': 
-        form = CustomedUserUpdateForm(request.POST, instance=request.user)
+        form = CustomedUserUpdateForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             return redirect('sneakers:index')

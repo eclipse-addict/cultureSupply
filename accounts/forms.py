@@ -16,6 +16,7 @@ class CustomedUserCreateForm(UserCreationForm):
                                                  'shoeSize',
                                                  'topSize',
                                                  'bottomSize',
+                                                 'profile_img',
                                                  )
 
 class CustomedUserUpdateForm(UserChangeForm):
@@ -27,4 +28,5 @@ class CustomedUserUpdateForm(UserChangeForm):
                   'last_name',
                   'shoeSize',
                   'topSize',
-                  'bottomSize',)
+                  'bottomSize',
+                  'profile_img',)

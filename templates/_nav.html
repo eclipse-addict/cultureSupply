@@ -16,32 +16,38 @@
         </a>
         </h5>
 
-        <div style="padding-left: 10px;" class="text-center ">
-          {% if request.user.is_authenticated %}
-          <div class="dropdown">
-            <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-              <strong>mdo</strong>
-            </a>
-            <ul class="dropdown-menu text-small shadow">
-              <li><a class="dropdown-item" href="#">New project...</a></li>
-              <li><a class="dropdown-item" href="#">Settings</a></li>
-              <li><a class="dropdown-item" href="{% url 'accounts:userUpdate' %}">Profile</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">Sign out</a></li>
-            </ul>
-            <form action="{% url 'accounts:logout' %}" method="post" >
-              {% csrf_token %}
-              <input type="submit" value="logout" class = "loginoutBtn">
-            </form>
-          </div>
+
+    <div style="padding-left: 10px;" class="text-center ">
+      {% if request.user.is_authenticated %}
+      <div class="dropdown">
+        <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          {% if user.profile_img %}
+          <img src="{{ user.profile_img.url }}" alt="" width="32" height="32" class="rounded-circle me-2">
           {% else %}
-          <button class="btn btn-sm btn-outline-secondary" type="button"><a href="{% url 'accounts:login' %}" class="text-decoration-none text-black">Login</a> </button>
-          <button class="btn btn-sm btn-outline-secondary" type="button"><a href="{% url 'accounts:signup' %}" class="text-decoration-none text-black">Sign Up</a> </button>
+          <img src="/media/user.png" alt="" width="32" height="32" class="rounded-circle me-2">
           {% endif %}
-        </div>
+          <strong>{{ user.username}}</strong>
+        </a>
+        <ul class="dropdown-menu text-small shadow">
+          <li><a class="dropdown-item" href="#">New Raffle...</a></li>
+          <li><a class="dropdown-item" href="#">Settings</a></li>
+          <li><a class="dropdown-item" href="{% url 'accounts:userUpdate' %}">Profile</a></li>
+          {% comment %} <li><hr class="dropdown-divider"></li> {% endcomment %}
+        </ul>
+      </div>
+    </div>
+      <div>
+        <form action="{% url 'accounts:logout' %}" method="post" >
+          {% csrf_token %}
+          <input type="submit" value="logout" class = "loginoutBtn">
+        </form>
+        {% else %}
+        <button class="btn btn-sm btn-outline-secondary" type="button"><a href="{% url 'accounts:login' %}" class="text-decoration-none text-black">Login</a> </button>
+        <button class="btn btn-sm btn-outline-secondary" type="button"><a href="{% url 'accounts:signup' %}" class="text-decoration-none text-black">Sign Up</a> </button>
+        {% endif %}
+      </div>
         <form class=" justify-content-start-100 justify-content-start ">
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
       <div class="offcanvas-body">
         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
