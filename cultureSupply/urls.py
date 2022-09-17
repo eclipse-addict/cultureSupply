@@ -18,11 +18,16 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
+from sneakers import views as main_view
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('articles/', include('articles.urls')),
     path('sneakers/', include('sneakers.urls')),
-    path('raffleInfos', include('raffleInfos.urls')),
+    path('raffleInfos/', include('raffleInfos.urls')),
+    path('socialLogin/', include('allauth.urls')),
+    path('', main_view.index, name='index'),
+    
     # path('', include('com.urls')),  app which contains only the main page    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

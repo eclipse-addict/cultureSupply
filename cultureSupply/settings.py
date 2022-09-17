@@ -33,6 +33,8 @@ def get_secret(setting):
         raise ImproperlyConfigured(error_msg)
 
 SECRET_KEY = get_secret("SECRET_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_secret("CLIENT_ID") # 구글 API에서 제공한 Key
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = get_secret("CLIENT_SECURITY_KEY") # 구글 API에서 제공한 Secret key
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -56,12 +58,23 @@ INSTALLED_APPS = [
     
     'bootstrap5',
     'imagekit',
+    # 'social_django',
+    
+    #allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    
+    # provider 
+    'allauth.socialaccount.providers.google',
     
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
+    
     'django.contrib.staticfiles',
     
 ]
@@ -81,7 +94,7 @@ ROOT_URLCONF = 'cultureSupply.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'templates', os.path.join(BASE_DIR, 'templates', 'account')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,7 +143,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'ko-kr'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Seoul'
 
@@ -168,3 +181,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # user model
 AUTH_USER_MODEL = 'accounts.User'
+
+# Social login 
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+SITE_ID = 1
+LOGIN_REDIRECT_URL = '/sneakers'
+SOCIALACCOUNT_LOGIN_ON_GET=True # redirecting page avoid, and direct to google login 

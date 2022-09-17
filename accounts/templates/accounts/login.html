@@ -1,27 +1,53 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
-{% load bootstrap5 %}
 
+
+{% load i18n %}
+{% load socialaccount %}
+
+{% block head_title %}{% trans "Log In" %}{% endblock %}
 
 {% block content %}
-<main class="form-signin w-100 m-auto">
-  <div class="container">
-    <form action="" method="post">
-      {%bootstrap_form form%}
-      {% csrf_token %}
-      <div class="text-center">
-        <input type="submit" value="Log in">
-        <button>
-          <a href="{% url 'accounts:signup' %}" class="text-decoration-none text-black">Sign up</a>
-        </button>
-        <button>
-          <a href="{% url 'sneakers:index' %}" class="text-decoration-none text-black">Back</a>
-        </button>
-      </div>
+
+<div class="" style="height:100vh; background-image: url({% static 'images/lgbg.jpeg' %})">
+  <div class="row justify-content-center h-100">
+      <div class="col align-self-center text-center card text-badge-dark bg-jellyho my-3" style="max-width: 25rem;">
+        <div class="card-header"><h1 style="font-family: 'Staatliches', cursive;" class="text-dark">Culture Supply</h1></div>
+        <div class="card-body">
+        <h3 class="card-title">Log In</h1>
+
+          {% get_providers as socialaccount_providers %}
+
+          <form class="login" method="POST" action="{% url 'account_login' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+            <button class="primaryAction" type="submit">Log In</button>
+          </form>
+          {% if socialaccount_providers %}
+
+          <div class="my-2">
+          <a href="/accounts/signup/?process=login&{{ redirect_field_name }}={{ redirect_field_value }}" role="button" class="btn btn btn-light my-1" style="display:block"><i class="far fa-envelope"></i> Sign Up by Email</a>
+          <button class="btn btn-outline-light">
+
+            <a href="{% provider_login_url 'google' %}" style="text-transform:none" class="text-decoration-none text-black">
+              <div class="left">
+                <img width="20px" class="mr-1" alt="Google &quot;G&quot; Logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"/>
+                Login with Google
+              </div>   
+            </a>          
+          </button>
+        </div>
+          {% comment %} {% include "socialaccount/snippets/login_extra.html" %} {% endcomment %}
+
+          {% else %}
+          <p>{% blocktrans %}If you have not created an account yet, then please
+          <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
+          {% endif %}
+        </div>
     </div>
-  </form>
   </div>
-</main>
-  
-  
-{% endblock content %}
+</div>
+{% endblock %}

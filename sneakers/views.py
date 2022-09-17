@@ -1,6 +1,6 @@
 from ast import Str
 from multiprocessing import context
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Sneaker
 from .forms import SneakerForm
@@ -11,12 +11,12 @@ from django.views.decorators.http import require_POST, require_safe, require_htt
 
 @require_safe
 def index(request):
-    sneakers = Sneaker.objects.all()[1::-1]
-    s_list = list(sneakers)
+    # sneakers = Sneaker.objects.all()[1::-1]
+    sneakers = get_list_or_404(Sneaker)
     # Banner 
-    sn1 = s_list[0]
-    sn2 = s_list[1]
-    sn3 = s_list[2]
+    sn1 = sneakers[0]
+    sn2 = sneakers[1]
+    sn3 = sneakers[2]
 
     context = {
         'sn1': sn1,
