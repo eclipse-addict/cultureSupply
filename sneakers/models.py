@@ -5,11 +5,14 @@ from django.conf import settings
 # main model of the project
 class Sneaker(models.Model):
     user         = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    model_name = models.CharField(max_length=255)
+    model_name   = models.CharField(max_length=255)
     release_date = models.DateField()
     describtion  = models.TextField()
     retail_price = models.CharField( max_length=100)
-    img          = models.ImageField(upload_to='images/sneakers/')
+    like_users   = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_users')
+    main_img     = models.ImageField(upload_to='images/sneakers/%Y/%m/%d/')
 
-    
+class Images(models.Model):
+    sneaker = models.ForeignKey(Sneaker, on_delete=models.CASCADE, null=True)
+    image   = models.ImageField(upload_to='images/sneakers/%Y/%m/%d/', blank=True, null=True)    
     

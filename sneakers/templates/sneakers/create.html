@@ -2,14 +2,15 @@
 {% load bootstrap5 %}
 
 {% block content %}
-<h1>create</h1>
 <div class="container">
 
   <form action="{% url 'sneakers:create' %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {%bootstrap_form form%}
-    {% comment %} <input type="submit" value="Save"> {% endcomment %}
-    <button type="submit" >save</button>  
+    <input type="file" name="imgs" multiple>
+    <div class="d-flex justify-content-center">
+      <button type="submit" class="" >save</button>
+    </div>
   </form>
 </div>
 {% endblock content %}
