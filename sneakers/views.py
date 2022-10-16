@@ -1,9 +1,14 @@
 from ast import Str
 from multiprocessing import context
+from pyexpat.errors import messages
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.contrib.auth.decorators import login_required
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from .models import Sneaker, Images
 from .forms import SneakerForm
+from .serializer.sneakers import SneakerListSerializer, SneakerSerializer
 from django.views.decorators.http import require_POST, require_safe, require_http_methods
 
 
@@ -73,3 +78,19 @@ def delete(request, pk):
 
 def update(request, pk):
     pass
+
+@api_view(['GET'])
+def v1_index(request):
+    sneaker = get_object_or_404(Sneaker, pk=1)
+    serializer = SneakerSerializer(sneaker)
+    
+    return Response(serializer.data)
+    
+@api_view(['GET', 'POST'])
+def v1_create(request):
+    if request.method == 'POST':
+        serializer = SneakerSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errorsm, status=status.HTTP_400_BAD_REQUEST)

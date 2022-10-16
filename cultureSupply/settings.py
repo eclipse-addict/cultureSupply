@@ -58,6 +58,9 @@ INSTALLED_APPS = [
     
     'bootstrap5',
     'imagekit',
+    'django_seed',
+    'django_extensions',
+    'rest_framework',
     # 'social_django',
     
     #allauth
@@ -175,7 +178,8 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join("staticfiles")
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+# https://docs.djangop
+# roject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

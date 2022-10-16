@@ -7,9 +7,10 @@
 
 ## Short Description
 
-> Culture Supply is a web domain which provide users an easy use automatic raffle system. in order to supply most latest raffle infos, domain will have a data crawling feature as well.
+> Culture Supply is a web domain which provides users an easy use automatic raffle system. in order to supply most latest raffle infos and chances to win them, domain will have a data crawling feature as well.
+> 
 
-### Technologies Used within project <br/>
+###  <br/>
 <div>
 <img src="https://img.shields.io/badge/Django-092E20?style=flat-square&logo=Django&logoColor=white"/>
 <img src="https://img.shields.io/badge/Django DRF-095E92?style=flat-square&logo=Django&logoColor=white"/>
