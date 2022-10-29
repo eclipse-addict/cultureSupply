@@ -21,14 +21,4 @@
 
 </div>
 
-
-### ERD
-| Still workign on it
-
-![erd](assets/CultureSupply_ERD220810.png)
-
-### StoryBoard
-
-
-### Django Modeling
  
