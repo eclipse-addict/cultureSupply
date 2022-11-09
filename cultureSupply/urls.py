@@ -27,7 +27,5 @@ urlpatterns = [
     path('sneakers/', include('sneakers.urls')),
     path('raffleInfos/', include('raffleInfos.urls')),
     path('socialLogin/', include('allauth.urls')),
-    path('', main_view.index, name='index'),
     
-    # path('', include('com.urls')),  app which contains only the main page    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
