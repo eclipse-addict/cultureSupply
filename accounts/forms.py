@@ -8,25 +8,13 @@ class CustomedUserCreateForm(UserCreationForm):
 
         model = get_user_model()
         # fields = UserCreationForm.Meta.fields 
-        fields = UserCreationForm.Meta.fields + ('email', 
-                                                 'first_name',
-                                                 'last_name',
-                                                 'phoneNumber', 
-                                                 'gender', 
-                                                 'shoeSize',
-                                                 'topSize',
-                                                 'bottomSize',
-                                                 'profile_img',
-                                                 )
+        fields = UserCreationForm.Meta.fields 
 
 class CustomedUserUpdateForm(UserChangeForm):
     
     class Meta(UserChangeForm.Meta):
         model = get_user_model()
-        fields = ('email', 
-                  'first_name',
-                  'last_name',
-                  'shoeSize',
-                  'topSize',
-                  'bottomSize',
-                  'profile_img',)
+        fields = UserChangeForm.Meta.fields + ('email', 
+                                               'first_name', 
+                                               'last_name',
+                                               )

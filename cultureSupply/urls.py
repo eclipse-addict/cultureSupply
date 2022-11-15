@@ -22,10 +22,14 @@ from sneakers import views as main_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')),
+    path('user/', include('accounts.urls')),
+    
+    path('accounts/', include('dj_rest_auth.urls')),
+    path('accounts/signup/', include('dj_rest_auth.registration.urls')),
+    path('socialLogin/', include('allauth.urls')),
+    
     path('articles/', include('articles.urls')),
     path('sneakers/', include('sneakers.urls')),
     path('raffleInfos/', include('raffleInfos.urls')),
-    path('socialLogin/', include('allauth.urls')),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

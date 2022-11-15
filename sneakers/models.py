@@ -14,5 +14,5 @@ class Sneaker(models.Model):
 class Image(models.Model):
     sneaker = models.ForeignKey(Sneaker, on_delete=models.CASCADE)
     image   = models.ImageField(upload_to='images/sneakers/%Y/%m/%d/', blank=True, null=True)    
-    main_img = models.BooleanField()
+    # main_img = models.BooleanField()
     

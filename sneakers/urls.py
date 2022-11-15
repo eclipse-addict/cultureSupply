@@ -8,4 +8,4 @@ from rest_framework.routers import DefaultRouter
 urlpatterns = [
     path('sneaker/', views.sneaker_list),
     path('sneaker/<int:pk>/', views.sneaker_detail),
-]
+] 

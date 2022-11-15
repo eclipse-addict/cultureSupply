@@ -17,7 +17,7 @@ class SneakerListSerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ('image', 'main_img',)
+        fields = ('image',)
 
 class SneakerDetailSerializer(serializers.ModelSerializer):
     # images = ImageSerializer(many=True, read_only=True)
@@ -33,7 +33,7 @@ class SneakerDetailSerializer(serializers.ModelSerializer):
         
     
     def create(self, validated_data):
-        instance = Sneaker.objects.create(**validated_data)
+        instance = Sneaker.objects.create(**validated_data, user = self.context['request'].user)
         image_set = self.context['request'].FILES
         
         for image_data in image_set.getlist('image'):
