@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import Sneaker, Images
+from .models import Sneaker, Image
 # Register your models here.
 
 class imageInline(admin.TabularInline):
-    model = Images
+    model = Image
     
 class SneakerAdmin(admin.ModelAdmin):
     inlines = [imageInline, ]

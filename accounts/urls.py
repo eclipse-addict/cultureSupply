@@ -1,15 +1,14 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from .views import *
+from rest_framework_simplejwt.views import TokenRefreshView
 
-app_name = 'accounts'
 
 urlpatterns = [
-    path('login/', views.login, name='login'),
-    path('logout/', views.logout, name='logout'),
-    path('signup/', views.signup, name='signup'),
-    path('register/', views.register, name='register'),
-    path('delete/', views.userDelete, name='userDelete'),
-    path('update/', views.userUpdate, name='userUpdate'),
-    path('password/', views.changePassword, name='changePassword'),
+    path('dj-rest-auth/', include('dj_rest_auth.urls')),
+    path('dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
+
+
     
+# post - 로그인, delete - 로그아웃, get - 유저정보  
 ]
+    

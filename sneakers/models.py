@@ -10,9 +10,9 @@ class Sneaker(models.Model):
     describtion  = models.TextField()
     retail_price = models.CharField( max_length=100)
     like_users   = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_users', blank=True)
-    main_img     = models.ImageField(upload_to='images/sneakers/%Y/%m/%d/')
 
-class Images(models.Model):
-    sneaker = models.ForeignKey(Sneaker, on_delete=models.CASCADE, null=True)
+class Image(models.Model):
+    sneaker = models.ForeignKey(Sneaker, on_delete=models.CASCADE)
     image   = models.ImageField(upload_to='images/sneakers/%Y/%m/%d/', blank=True, null=True)    
+    # main_img = models.BooleanField()
     

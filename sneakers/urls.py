@@ -1,14 +1,11 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
+from rest_framework.routers import DefaultRouter
 
-app_name = 'sneakers'
+# router = DefaultRouter()
+# router.register(r'sneaker', views.SneakerViewSet)
+
 urlpatterns = [
-    path('', views.index),
-    path('create/', views.create, name='create'),
-    path('<int:pk>/update/', views.update, name='update'),
-    path('<int:pk>/', views.detail, name='detail'),
-    
-    path('v1/index', views.v1_index, name='v1_index'),
-    path('v1/create/', views.v1_create, name='v1_create'),
-    
-]
+    path('sneaker/', views.sneaker_list),
+    path('sneaker/<int:pk>/', views.sneaker_detail),
+] 
