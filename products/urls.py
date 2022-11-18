@@ -5,6 +5,7 @@ from . import views
 # router.register(r'sneaker', views.SneakerViewSet)
 
 urlpatterns = [
-    path('search/<str:query>', views.stockX_data_paser),
+    path('new/', views.new_release_paser),
+    path('brand/', views.sneaker_data_by_brand_paser),
 
 ] 

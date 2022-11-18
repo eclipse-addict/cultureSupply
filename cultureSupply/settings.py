@@ -36,6 +36,12 @@ SECRET_KEY = get_secret("SECRET_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_secret("CLIENT_ID") # 구글 API에서 제공한 Key
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = get_secret("CLIENT_SECURITY_KEY") # 구글 API에서 제공한 Secret key
 
+J_URL_M = get_secret("j_url_m")
+J_URL_F = get_secret("j_url_f")
+N_URL_M = get_secret("n_url_m")
+N_URL_M = get_secret("n_url_f")
+NEW_RELEASE_URL = get_secret("new_release_url")
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 

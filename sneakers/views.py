@@ -56,19 +56,24 @@ def test_req(request):
     
     query = 'jordan 1'
     
-    url = f'https://stockx.com/api/browse?_search={query}&page=25'
+    # url = f'https://stockx.com/api/browse?_search={query}&page=25'
+    # url = 'https://www.thesneakerdatabase.com/api/getData?brand=Jordan&name=jordan+1'
+    url = 'https://www.thesneakerdatabase.com/api/newReleases'
     
     # url = 'https://stockx.com/sneakers/release-date?years=2022'
 
     headers = {
         'accept': 'application/json',
         'accept-encoding': 'utf-8',
-        'accept-language': 'en-GB,en;q=0.9',
+        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Origin': 'https://thesneakerdatabase.com',
         'app-platform': 'Iron',
+        'Host': 'www.thesneakerdatabase.com',
         'referer': 'https://stockx.com/en-gb',
         'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"',
         'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
+        'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
+        'sec-ch-ua-platform': '"macOS"',
         'sec-fetch-dest': 'empty',
         'sec-fetch-mode': 'cors',
         'sec-fetch-site': 'same-origin',
@@ -80,8 +85,8 @@ def test_req(request):
     output = json.loads(html.text)
     # http://localhost:8000/sneakers/sneaker/test
     # json.loads(response.text)
-    # print('request result', html)
-    # print('TEST RESULT :', html.text)
+    print('request result', html)
+    print('TEST RESULT :', html.text)
     
 
 #    dict_keys(['id', 'uuid', 'brand', 'browseVerticals', 'category', 'charityCondition', 'colorway', 
@@ -91,6 +96,27 @@ def test_req(request):
 # '_tags', 'lock_selling', 'selling_countries', 'buying_countries', 'hot_keywords_updated_date', 'product_importance_score', 
 # 'calculated_display_title', 'hot_keywords', 'lowestAskThresholdMet', 'objectID'])
 
-    print('TEST RESULT :', output['Products'][0]['brand'])
+    # print('TEST RESULT :', output['Products'][0]['brand'])
     
     return HttpResponse(html.text)
+
+
+
+
+
+    # stockx headrer
+    # headers = {
+    #     'accept': 'application/json',
+    #     'accept-encoding': 'utf-8',
+    #     'accept-language': 'en-GB,en;q=0.9',
+    #     'app-platform': 'Iron',
+    #     'referer': 'https://stockx.com/en-gb',
+    #     'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"',
+    #     'sec-ch-ua-mobile': '?0',
+    #     'sec-ch-ua-platform': '"Windows"',
+    #     'sec-fetch-dest': 'empty',
+    #     'sec-fetch-mode': 'cors',
+    #     'sec-fetch-site': 'same-origin',
+    #     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.62 Safari/537.36',
+    #     'x-requested-with': 'XMLHttpRequest'
+    # }
