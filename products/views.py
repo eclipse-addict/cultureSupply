@@ -1,5 +1,5 @@
 from django.shortcuts import get_list_or_404, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework import status
 from .models import kicks
 from django.conf import settings
@@ -7,6 +7,26 @@ from .serializers import kicksSerializer
 import pprint
 import requests
 import json
+
+'''
+returns 15 most recent drops (no paginations) -> for main page component
+'''
+def newest_release(request):
+    if request.method == 'GET':
+        product_list = kicks.objects.order_by('-releaseDate')[0:15]
+        serializer = kicksSerializer(product_list, many=True)
+        return JsonResponse(serializer.data, safe=False)
+    else:
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+
+
+
+
+
 
 '''
 sneakers Data paser v1.0.0
@@ -36,10 +56,10 @@ new_release_url = getattr(settings, 'NEW_RELEASE_URL', None)
 
 
 def create_new_kick_data(products_list, p):
-    print('new_release_url : ', new_release_url)
     try:
         kicks.objects.get(sku=products_list[p]['sku'])
         print('Already exists')
+        return 0
     except kicks.DoesNotExist:
             # 존재하지 않는 제품이므로, 등록 처리
         print('New product')
@@ -60,6 +80,7 @@ def create_new_kick_data(products_list, p):
             )
         kick.save()
         
+        return 1 
 
 
 def new_release_paser(request):
@@ -68,10 +89,11 @@ def new_release_paser(request):
     print('res: ', response.status_code)
     json_data = json.loads(response.text)
     products_list = json_data['data']
+    new_cnt = 0
     
     for p in range(len(products_list)):
-        create_new_kick_data(products_list, p)
-
+        new_cnt += create_new_kick_data(products_list, p)
+    print(f'new Count = {new_cnt}')
     return HttpResponse(status= status.HTTP_201_CREATED)
 
 
@@ -88,40 +110,21 @@ def sneaker_datasneaker_data_by_year_paser_by_brand_paser(request):
     return HttpResponse(status= status.HTTP_201_CREATED)
 
 
-# TODO: .env 
 def sneaker_data_by_brand_paser(request):
     j_url_m = getattr(settings, 'J_URL_M', None)
     j_url_f = getattr(settings, 'J_URL_F', None)
     n_url_m = getattr(settings, 'N_URL_M', None)
     n_url_f = getattr(settings, 'N_URL_M', None)
     
-    response = requests.get(url=n_url_m, headers=headers)
+
+    cnt = 0
+    response = requests.get(url=n_url_f, headers=headers)
     json_data = json.loads(response.text)
     products_list = json_data['data']
     
     for p in range(len(products_list)):
-        try:
-            kicks.objects.get(sku=products_list[p]['sku'])
-            print('Already exists')
-        except kicks.DoesNotExist:
-            # 존재하지 않는 제품이므로, 등록 처리
-            print('New product')
-            kick = kicks(
-                        uuid                 = products_list[p]['_id'],
-                        brand                = products_list[p]['brand'],
-                        colorway             = products_list[p]['colorway'],                    
-                        gender               = products_list[p]['gender'],
-                        description          = products_list[p]['story'],
-                        name                 = products_list[p]['name'],
-                        releaseDate          = products_list[p]['releaseDate'],
-                        retailPrice          = products_list[p]['retailPrice'],
-                        estimatedMarketValue = products_list[p]['estimatedMarketValue'],
-                        sku                  = products_list[p]['sku'],
-                        imageUrl             = products_list[p]['image']['original'],
-                        smallImageUrl        = products_list[p]['image']['small'],
-                        thumbUrl             = products_list[p]['image']['thumbnail'],
-                )
-            kick.save()
-        # create_new_kick_data(products_list, p)
-
+        cnt += create_new_kick_data(products_list, p)
+    
+    print(f'new Count : {cnt}')
+    
     return HttpResponse(status= status.HTTP_201_CREATED)

@@ -7,5 +7,6 @@ from . import views
 urlpatterns = [
     path('new/', views.new_release_paser),
     path('brand/', views.sneaker_data_by_brand_paser),
+    path('recent/', views.newest_release),
 
 ] 
