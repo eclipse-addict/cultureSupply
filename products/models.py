@@ -24,4 +24,9 @@ class kicks(models.Model):
     smallImageUrl        = models.CharField(max_length=500, )
     thumbUrl             = models.CharField(max_length=500, )
     
+    local_imageUrl             = models.CharField(max_length=500, default=' ')
+    local_smallImageUrl        = models.CharField(max_length=500, default=' ')
+    local_thumbUrl             = models.CharField(max_length=500, default=' ')
+    
+    
     
