@@ -8,20 +8,23 @@ from .serializers import kicksSerializer
 import pprint
 import requests
 import json
-import urllib3
 import urllib.request as req
 from urllib.parse import urlparse
 import chardet
 import os
 import time
+import shutil
 from yarl import URL
+from google_images_download import google_images_download   #importing the library
+
+
 
 '''
 returns 15 most recent drops (no paginations) -> for main page component
 '''
 def popular_release(request):
     if request.method == 'GET':
-        product_list = kicks.objects.exclude(local_imageUrl='http://localhost:8000/media/images/defaultImg.png').order_by('-releaseDate', '-estimatedMarketValue')[0:12]
+        product_list = kicks.objects.exclude(local_imageUrl='http://localhost:8000/media/images/defaultImg.png').order_by('-releaseDate')[0:12]
         
         serializer = kicksSerializer(product_list, many=True)
         return JsonResponse(serializer.data, safe=False)
@@ -34,13 +37,15 @@ def popular_release(request):
 '''
 def main_img(request):
     if request.method == 'GET':
-        product_list = kicks.objects.exclude(local_imageUrl='http://localhost:8000/media/images/defaultImg.png').order_by('-releaseDate')[0:15]
+        product_list = kicks.objects.exclude(local_imageUrl='http://localhost:8000/media/images/defaultImg.png').order_by('-releaseDate', '-estimatedMarketValue')[:25]
         main_img = product_list[0]
+        result = []
         for p in product_list:
             if main_img.estimatedMarketValue < p.estimatedMarketValue:
                 main_img = p
-        print(f'main_img : {main_img}')
-        serializer = kicksSerializer(main_img)
+                result.append(main_img)
+        print(f'main_img : {result}')
+        serializer = kicksSerializer(result[:2], many=True)
         return JsonResponse(serializer.data, safe=False)
     else:
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
@@ -60,7 +65,16 @@ def get_sneaker(request):
     print(f'res : {sneakers}')
     
     return JsonResponse(serializer.data, safe=False)
+
+def get_detail(request):
+    kick = get_object_or_404(kicks, id=request.GET.get('id'))
     
+    serializer = kicksSerializer(kick)
+    print(f'res : {kick}')
+    
+    return JsonResponse(serializer.data, safe=False)
+
+
 
 '''
 sneakers Data paser v1.0.0
@@ -277,3 +291,31 @@ def check_dir(local_path):
     except OSError:
         print(OSError.strerror)
 
+def google_img_download(request):
+    all_products = kicks.objects.filter(imageUrl='').order_by('-releaseDate')
+    
+    for p in all_products:
+        response = google_images_download.googleimagesdownload()   #class instantiation
+        arguments = {"keywords":p.name,
+                    "limit":1,
+                    "print_urls":True,
+                    # "specific_site": "stockx.com/",
+                    "image_directory": "images/sneakers/",
+                    "output_directory": "media/"
+                    }   
+        
+        try:
+            paths = response.download(arguments)  
+            
+            raw_url = paths[0][list(paths[0].keys())[0]]
+
+            print(f'final check2 : {"http://localhost:8000" + raw_url[0][raw_url[0].find("/media"):]}') #
+            p.local_imageUrl = "http://localhost:8000" + raw_url[0][raw_url[0].find("/media"):]
+            p.save()
+                
+        except Exception as error:
+            print(f'error : {error}')
+            continue
+
+    
+    return HttpResponse(status.HTTP_201_CREATED)
