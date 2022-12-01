@@ -66,8 +66,8 @@ def get_sneaker(request):
     
     return JsonResponse(serializer.data, safe=False)
 
-def get_detail(request):
-    kick = get_object_or_404(kicks, id=request.GET.get('id'))
+def get_detail(request, id):
+    kick = get_object_or_404(kicks, id=id)
     
     serializer = kicksSerializer(kick)
     print(f'res : {kick}')
@@ -108,14 +108,23 @@ def create_new_kick_data(products_list, p):
     try:
         kick = kicks.objects.get(sku=products_list[p]['sku'])
         print('Already exists')
-        # 이미 등록된 제품이지만, 이미지 파일 업데이트 확인 
-
+        # TODO: 이미 등록된 제품이지만, 이미지 파일 업데이트 확인  module 로 빼기. 
+        result = 0
         if products_list[p]['image']['original'] != '' and kick.imageUrl == '':
             print('product image updated')
             kick.imageUrl      = products_list[p]['image']['original']
             kick.smallImageUrl = products_list[p]['image']['small']
             kick.thumbUrl      = products_list[p]['image']['thumbnail']
-
+            
+            result +=1
+            
+        if products_list[p]['releaseDate'] != '' and kick.releaseDate == '1900-00-00':
+            print(f'releaseDate update for {kick.name}')
+            kick.releaseDate = products_list[p]['releaseDate']
+            
+            result +=1
+            
+        if result >0:
             kick.save()
             
             return 1

@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('img/main/', views.main_img),
     path('sneaker/', views.get_sneaker),
+    path('sneaker/<int:id>/', views.get_detail),
     
     # urls for admin
     path('new/', views.new_release_paser),
