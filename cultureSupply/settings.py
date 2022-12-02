@@ -60,8 +60,8 @@ INSTALLED_APPS = [
     'articles',
     'accounts',  
     'raffleInfos',
-    'sneakers',
     'products',
+    'reviews',
     
     'bootstrap5',
     'imagekit',

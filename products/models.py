@@ -1,6 +1,6 @@
 from django.db import models
+from django.conf import settings
 
-# Create your models here. 
 
 class kicks(models.Model):
     # uuid that stock asigned for this product 
@@ -28,5 +28,6 @@ class kicks(models.Model):
     local_smallImageUrl        = models.CharField(max_length=500, default=' ')
     local_thumbUrl             = models.CharField(max_length=500, default=' ')
     
-  
+    like_users   = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_users', blank=True)
+
     

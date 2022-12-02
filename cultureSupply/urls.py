@@ -17,20 +17,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-from sneakers import views as main_view
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('user/', include('accounts.urls')),
-    path('sneakers/', include('sneakers.urls')),
     path('api/', include('products.urls')),
 
     # path('accounts/', include('allauth.urls')),
     # path('accounts/', include('accounts.urls')),
-    
-    
     # path('articles/', include('articles.urls')),
     # path('raffleInfos/', include('raffleInfos.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
