@@ -41,3 +41,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 	# 사용자의 username field는 email으로 설정 (이메일로 로그인)
     USERNAME_FIELD = 'email'
+    
+    
+class UserInfo(models.Model):
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    GENDER_CHOICES = ('M', 'Male'), ('F', 'Female')
+    CLOTHES_SIZE = ('xs', 'XS'), ('sm','S'), ('md', 'M'), ('lg', 'L'), ('xlg', 'XL'),('xxlg', 'XXL'),('xxxlg', 'XXXL'),
+    SHOE_SIZE = ('200', 200), ('205',205), ('210', 210), ('220', 220),
+    ('230', 230), ('240', 240), ('250', 250), ('260', 260), ('270', 270), ('280', 280),
+    ('290', 280), ('300', 300), ('300', 300), ('310', 310),
+    
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default= '', null=True, blank=True)
+    shoeSize = models.CharField(max_length=10, choices=SHOE_SIZE, default= '', null=True, blank=True)
+    topSize = models.CharField(max_length=10, choices=CLOTHES_SIZE, default= '', null=True, blank=True)
+    bottomSize = models.CharField(max_length=10, choices=CLOTHES_SIZE, default= '', null=True, blank=True)
