@@ -1,12 +1,14 @@
 from django.urls import path, include
-from .views import *
+from . import views
 from rest_framework_simplejwt.views import TokenRefreshView
 
 
 urlpatterns = [
     path('dj-rest-auth/', include('dj_rest_auth.urls')),
     path('dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
-
+    path('userinfo/<int:user_pk>/', views.userInfo),
+    path('nickcheck/', views.nick_name_check),
+    path('emailcheck/', views.email_check),
 
     
 # post - 로그인, delete - 로그아웃, get - 유저정보  

@@ -210,7 +210,7 @@ def sneaker_img_paser(request):
     
     for i, p in enumerate(all_products):
         if p.imageUrl!='' and p.imageUrl.find('stockx')== -1:
-            print(f'Name check (goat): {p.name}')
+            print(f'Name check (goat):{p.id} {p.name}')
             imageUrl = p.imageUrl
             # path = os.path.dirname(imageUrl)[22:]
             # 저장 경로 
@@ -219,9 +219,6 @@ def sneaker_img_paser(request):
             path_url = path[:path.find(file_name)]
             
             
-            local_path = '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers'+path_url
-            # print(f'path check : {local_path}')
-            # 저장 할 제품 이름
             # 디렉토리가 없으면 생성
             # check_dir(local_path)
             # 설정한 경로에 파일 저장 
@@ -246,7 +243,7 @@ def sneaker_img_paser(request):
             p.local_smallImageUrl = small_img_url
             ################################################################################################
             thumbUrl = p.thumbUrl
-           # 저장 할 제품 이름
+            # 저장 할 제품 이름
             file_name = os.path.basename(thumbUrl)
             path = urlparse(thumbUrl).path
             path_url = path[:path.find(file_name)]

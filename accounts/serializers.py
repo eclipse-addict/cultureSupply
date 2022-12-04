@@ -1,4 +1,4 @@
-from .models import User
+from .models import User, UserInfo
 from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,3 +12,10 @@ class UserSerializer(serializers.ModelSerializer):
             password = validated_data['password']
         )
         return user
+    
+class UserInfoSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = UserInfo
+        fields = '__all__'
+        read_only_fields = ( 'user',)
