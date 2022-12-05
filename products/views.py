@@ -1,4 +1,5 @@
 from django.shortcuts import get_list_or_404, get_object_or_404
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from rest_framework import status
@@ -58,13 +59,39 @@ TODO: Searching function needs to be added.
 '''
 def get_sneaker(request): 
     page = request.GET.get("page")
-    sneaker_list = kicks.objects.all().order_by('-releaseDate')
+    keyword = request.GET.get("keyword")
+    gender = request.GET.get("gender")
+    brand = request.GET.get("brand")
+    
+    # 빈 문자열 || gender, brand 가 All => 전체 검색 
+    sneaker_list = None
+    q = Q()
+    
+    if keyword == '' and gender == 'All' and brand == 'All':
+        sneaker_list = kicks.objects.all().order_by('-releaseDate')
+    else:
+    #키워드 설정     
+        if keyword != '':
+            q.add(Q(name__icontains=keyword), q.AND)
+        elif gender != 'All':
+            print(f'gender {gender}')
+            q.add(Q(gender__icontains=gender), q.AND)
+        elif brand != 'All':
+            print(f'brand!!! {brand}')
+            q.add(Q(brand__icontains=brand), q.AND)
+
+        sneaker_list = kicks.objects.filter(q)
+        
     paginator = Paginator(sneaker_list, 20)
     sneakers = paginator.get_page(page)
-    serializer = kicksSerializer(sneakers, many=True)
-    print(f'res : {sneakers}')
-    
-    return JsonResponse(serializer.data, safe=False)
+    if sneakers.has_next():
+        serializer = kicksSerializer(sneakers, many=True)
+        print(f'res : {sneakers}')
+        
+        return JsonResponse(serializer.data, safe=False)
+    else: 
+        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
+        # return HttpResponse(status=status.HTTP_100_CONTINUE)
 
 def get_detail(request, id):
     kick = get_object_or_404(kicks, id=id)
@@ -209,6 +236,7 @@ def sneaker_img_paser(request):
     all_products = kicks.objects.filter(local_imageUrl='http://localhost:8000/media/images/defaultImg.png').order_by('-releaseDate')
     
     for i, p in enumerate(all_products):
+        
         if p.imageUrl!='' and p.imageUrl.find('stockx')== -1:
             print(f'Name check (goat):{p.id} {p.name}')
             imageUrl = p.imageUrl
@@ -287,7 +315,7 @@ def sneaker_img_paser(request):
             p.local_imageUrl = img_url
             p.save()
             print(f'update Count : {i}')
-    print(time.time() - start)
+    print(f'1000 product time check : {time.time() - start}')
     return HttpResponse(status= status.HTTP_200_OK)
 
 def check_dir(local_path):

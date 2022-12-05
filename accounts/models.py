@@ -57,10 +57,10 @@ class UserInfo(models.Model):
     last_name = models.CharField(max_length=200, default='', blank=True, null=True)
     nick_name = models.CharField(max_length=200, default='', blank=True, null=True)
     
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default= '', null=True, blank=True)
-    shoeSize = models.CharField(max_length=10, choices=SHOE_SIZE, default= '', null=True, blank=True)
-    topSize = models.CharField(max_length=10, choices=CLOTHES_SIZE, default= '', null=True, blank=True)
-    bottomSize = models.CharField(max_length=10, choices=CLOTHES_SIZE, default= '', null=True, blank=True)
+    gender = models.CharField(max_length=10, default= '', null=True, blank=True)
+    shoeSize = models.CharField(max_length=10, default= '', null=True, blank=True)
+    topSize = models.CharField(max_length=10, default= '', null=True, blank=True)
+    bottomSize = models.CharField(max_length=10, default= '', null=True, blank=True)
     
     zipCode = models.CharField(max_length=100, blank=True, null=True)
     address = models.CharField(max_length=1500, blank=True, null=True)
