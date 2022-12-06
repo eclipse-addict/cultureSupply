@@ -17,7 +17,7 @@ import time
 import shutil
 from yarl import URL
 from google_images_download import google_images_download   #importing the library
-
+from bs4 import BeautifulSoup
 
 
 '''
@@ -65,12 +65,13 @@ def get_sneaker(request):
     
     # 빈 문자열 || gender, brand 가 All => 전체 검색 
     sneaker_list = None
+    paginator = None
     q = Q()
     
     if keyword == '' and gender == 'All' and brand == 'All':
         sneaker_list = kicks.objects.all().order_by('-releaseDate')
     else:
-    #키워드 설정     
+    #키워드 설정     Q(original_title__contains=search_word) | Q(title__contains=search_word)
         if keyword != '':
             q.add(Q(name__icontains=keyword), q.AND)
         elif gender != 'All':
@@ -80,18 +81,22 @@ def get_sneaker(request):
             print(f'brand!!! {brand}')
             q.add(Q(brand__icontains=brand), q.AND)
 
-        sneaker_list = kicks.objects.filter(q)
+        sneaker_list = kicks.objects.filter(q).order_by('-releaseDate')
+    
+    if len(sneaker_list) >= 10:
+        paginator = Paginator(sneaker_list, 20)
         
-    paginator = Paginator(sneaker_list, 20)
-    sneakers = paginator.get_page(page)
-    if sneakers.has_next():
-        serializer = kicksSerializer(sneakers, many=True)
-        print(f'res : {sneakers}')
-        
-        return JsonResponse(serializer.data, safe=False)
-    else: 
+    elif 0 < len(sneaker_list) < 10:
+        paginator = Paginator(sneaker_list, len(sneaker_list))
+    else:
         return HttpResponse(status=status.HTTP_204_NO_CONTENT)
-        # return HttpResponse(status=status.HTTP_100_CONTINUE)
+    
+    sneakers = paginator.get_page(page)
+    serializer = kicksSerializer(sneakers, many=True)
+        
+    return JsonResponse(serializer.data, safe=False)
+
+
 
 def get_detail(request, id):
     kick = get_object_or_404(kicks, id=id)
@@ -109,20 +114,21 @@ sneakers Data paser v1.0.0
 '''
 pp = pprint.PrettyPrinter(indent=4)
 headers = {
-    'accept': 'application/json',
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
     'accept-encoding': 'utf-8',
     'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
     'Origin': 'https://thesneakerdatabase.com',
     'app-platform': 'Iron',
-    'Host': 'www.thesneakerdatabase.com',
-    'referer': 'https://stockx.com/en-gb',
+    # 'Host': '',
+    'referer': 'https://thesneakerdatabase.com/sneakers/6778a67b-669c-4c3e-8ca0-2d3f1c911a8b',
     'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="102", "Google Chrome";v="102"',
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
     'sec-ch-ua-platform': '"macOS"',
-    'sec-fetch-dest': 'empty',
-    'sec-fetch-mode': 'cors',
+    'sec-fetch-dest': 'document',
+    'sec-fetch-mode': 'navigate',
     'sec-fetch-site': 'same-origin',
+    'sec-fetch-user': '?1',
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.62 Safari/537.36',
     'x-requested-with': 'XMLHttpRequest'
 }
@@ -153,7 +159,6 @@ def create_new_kick_data(products_list, p):
             
         if result >0:
             kick.save()
-            
             return 1
         
         return 0
@@ -184,16 +189,21 @@ def create_new_kick_data(products_list, p):
 def new_release_paser(request):
     
     response = requests.get(url=new_release_url, headers=headers)
-    print('res: ', response.status_code)
-    json_data = json.loads(response.text)
-    products_list = json_data['data']
+    print(response.status_code)
+
     new_cnt = 0
+    if response.status_code == 200:
+        html = response.text
+        soup = BeautifulSoup(html, 'html.parser')
+        data = soup.select_one('#__NEXT_DATA__').get_text()
+        json_data = json.loads(data)
+        products_list = json_data['props']['pageProps']['newReleases']
     
     for p in range(len(products_list)):
         new_cnt += create_new_kick_data(products_list, p)
     print(f'new Count = {new_cnt}')
     return HttpResponse(status= status.HTTP_201_CREATED)
-
+    # return JsonResponse(json_data['props']['pageProps']['newReleases'], safe=False)
 
 
 def sneaker_datasneaker_data_by_year_paser_by_brand_paser(request):
