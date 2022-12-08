@@ -2,10 +2,13 @@ from django.shortcuts import get_list_or_404, get_object_or_404
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
-from .models import kicks
-from django.conf import settings
 from .serializers import kicksSerializer
+from django.conf import settings
+from .models import kicks
+from datetime import date, timedelta
 import pprint
 import requests
 import json
@@ -18,7 +21,6 @@ import shutil
 from yarl import URL
 from google_images_download import google_images_download   #importing the library
 from bs4 import BeautifulSoup
-
 
 '''
 returns 15 most recent drops (no paginations) -> for main page component
@@ -67,9 +69,9 @@ def get_sneaker(request):
     sneaker_list = None
     paginator = None
     q = Q()
-    
+    today = date.today()
     if keyword == '' and gender == 'All' and brand == 'All':
-        sneaker_list = kicks.objects.all().order_by('-releaseDate')
+        sneaker_list = kicks.objects.filter(releaseDate__range=[date.today() - timedelta(days=15), date.today() + timedelta(days=15)]).all().order_by('-releaseDate')
     else:
     #키워드 설정     Q(original_title__contains=search_word) | Q(title__contains=search_word)
         if keyword != '':
@@ -97,7 +99,8 @@ def get_sneaker(request):
     return JsonResponse(serializer.data, safe=False)
 
 
-
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_detail(request, id):
     kick = get_object_or_404(kicks, id=id)
     

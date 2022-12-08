@@ -10,14 +10,14 @@ class UserManager(BaseUserManager):
             email=email,
         )
         user.set_password(password)
-        user.save(using=self._db)
+        user.save(using = self._db)
         return user
 
     def create_superuser(self, email=None, password=None, **extra_fields):
 
-        superuser = self.create_user(
-            email=email,
-            password=password,
+        superuser    = self.create_user(
+            email    = email,
+            password = password,
         )
         
         superuser.is_staff = True
@@ -29,12 +29,12 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     
-    email = models.EmailField(max_length=30, unique=True, null=False, blank=False)
+    email        = models.EmailField(max_length=30, unique=True, null=False, blank=False)
     is_superuser = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    is_active    = models.BooleanField(default=True)
+    is_staff     = models.BooleanField(default=False)
+    created_at   = models.DateTimeField(auto_now_add=True)
+    updated_at   = models.DateTimeField(auto_now=True)
 
 	# 헬퍼 클래스 사용
     objects = UserManager()
@@ -54,13 +54,13 @@ class UserInfo(models.Model):
     
     
     first_name = models.CharField(max_length=200, default='', blank=True, null=True)
-    last_name = models.CharField(max_length=200, default='', blank=True, null=True)
-    nick_name = models.CharField(max_length=200, default='', blank=True, null=True)
+    last_name  = models.CharField(max_length=200, default='', blank=True, null=True)
+    nick_name  = models.CharField(max_length=200, default='', blank=True, null=True)
     
-    gender = models.CharField(max_length=10, default= '', null=True, blank=True)
-    shoeSize = models.CharField(max_length=10, default= '', null=True, blank=True)
-    topSize = models.CharField(max_length=10, default= '', null=True, blank=True)
+    gender     = models.CharField(max_length=10, default= '', null=True, blank=True)
+    shoeSize   = models.CharField(max_length=10, default= '', null=True, blank=True)
+    topSize    = models.CharField(max_length=10, default= '', null=True, blank=True)
     bottomSize = models.CharField(max_length=10, default= '', null=True, blank=True)
     
-    zipCode = models.CharField(max_length=100, blank=True, null=True)
-    address = models.CharField(max_length=1500, blank=True, null=True)
+    zipCode    = models.CharField(max_length=100, blank=True, null=True)
+    address    = models.CharField(max_length=1500, blank=True, null=True)

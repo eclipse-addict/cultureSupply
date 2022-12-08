@@ -24,8 +24,10 @@ if settings.DEBUG:
     urlpatterns = [
         path('admin/', admin.site.urls),
 
-        path('user/', include('accounts.urls')),
         path('api/', include('products.urls')),
+        path('user/', include('accounts.urls')),
+        path('review/', include('reviews.urls')),
+        
         path('__debug__/', include(debug_toolbar.urls)),
 
 
