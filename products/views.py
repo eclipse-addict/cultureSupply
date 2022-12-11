@@ -21,6 +21,7 @@ import shutil
 from yarl import URL
 from google_images_download import google_images_download   #importing the library
 from bs4 import BeautifulSoup
+from assets.brand_list import brand_list
 
 '''
 returns 15 most recent drops (no paginations) -> for main page component
@@ -135,53 +136,102 @@ headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.62 Safari/537.36',
     'x-requested-with': 'XMLHttpRequest'
 }
+goat_headers = {
+    'accept': '*/*',
+    'accept-encoding': 'utf-8',
+    'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Origin': 'https://www.goat.com',
+    'sec-ch-ua': '"Not?A_Brand";v="8", "Chromium";v="108", "Google Chrome";v="108"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"macOS"',
+    'sec-fetch-dest': 'empty',
+    'sec-fetch-mode': 'cors',
+    'sec-fetch-site': 'cross-site',
+    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
+}
 
 new_release_url = getattr(settings, 'NEW_RELEASE_URL', None)
-
-
+# 284,361 /200 = // current 21 page 
+def get_goat(request):
+    # request_URL = 'https://ac.cnstrc.com/browse/brand/air%20jordan?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=3&page=1&num_results_per_page=24&filters%5Brelease_date_year%5D=1985&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670597951900'
+    # request_URL = 'https://ac.cnstrc.com/browse/brand/air%20jordan?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=4&page=1&num_results_per_page=200&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670599038050'
+    # 아래 url 에 브랜드 이름을 바꿔서 요청을 구현 
+    #브랜드 이름 리스트로 만들기. 
+    
+    for brand in brand_list: # brand 먼저 픽스 
+        for i in range(1, 300):
+            all_year_by_brand_url = f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=5&page={i}&num_results_per_page=200&filters%5Brelease_date_year%5D=2022&filters%5Brelease_date_year%5D=2021&filters%5Brelease_date_year%5D=2020&filters%5Brelease_date_year%5D=2018&filters%5Brelease_date_year%5D=2019&filters%5Brelease_date_year%5D=2017&filters%5Brelease_date_year%5D=2016&filters%5Brelease_date_year%5D=2023&filters%5Brelease_date_year%5D=2015&filters%5Brelease_date_year%5D=2014&filters%5Brelease_date_year%5D=2013&filters%5Brelease_date_year%5D=2012&filters%5Brelease_date_year%5D=2011&filters%5Brelease_date_year%5D=2010&filters%5Brelease_date_year%5D=2008&filters%5Brelease_date_year%5D=2009&filters%5Brelease_date_year%5D=2006&filters%5Brelease_date_year%5D=2007&filters%5Brelease_date_year%5D=2005&filters%5Brelease_date_year%5D=2004&filters%5Brelease_date_year%5D=2002&filters%5Brelease_date_year%5D=2003&filters%5Brelease_date_year%5D=2001&filters%5Brelease_date_year%5D=2000&filters%5Brelease_date_year%5D=1999&filters%5Brelease_date_year%5D=1998&filters%5Brelease_date_year%5D=1997&filters%5Brelease_date_year%5D=1996&filters%5Brelease_date_year%5D=1985&filters%5Brelease_date_year%5D=1986&filters%5Brelease_date_year%5D=1989&filters%5Brelease_date_year%5D=1991&filters%5Brelease_date_year%5D=1993&filters%5Brelease_date_year%5D=1995&filters%5Brelease_date_year%5D=1994&filters%5Brelease_date_year%5D=1992&filters%5Brelease_date_year%5D=1990&filters%5Brelease_date_year%5D=1988&filters%5Bbrand%5D={brand.lower()}&sort_by=gp_lowest_price_cents_3&sort_order=descending&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670659812126'
+            # request_URL = f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=5&page={i}&num_results_per_page=200&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670600851575'
+            response = requests.get(url=all_year_by_brand_url, headers=goat_headers)
+            print('res: ', response.status_code)
+            json_data = json.loads(response.text)
+            products_list = json_data['response'].get('results')
+            total_num_results = json_data['response']['total_num_results']
+            # print('products_list: ', products_list[0]['data'])
+            # print('products_list: ', len(products_list))
+            if not products_list:
+                print(f'Nomore products found. {brand} finished at page : {i}page.')
+                break
+            
+            new_cnt = 0
+            for p in range(len(products_list)):
+                new_cnt += create_new_kick_data(products_list, p)
+                
+            print(f'new page Count = {i} // new Product Count: {new_cnt}')
+        
+    return HttpResponse(status=status.HTTP_201_CREATED)
 
 def create_new_kick_data(products_list, p):
+    print(f"products_list[p]['value']: {products_list[p]['value']}")
     try:
-        kick = kicks.objects.get(sku=products_list[p]['sku'])
-        print('Already exists')
+        if not products_list[p]['data']['sku']:
+            print(f'No sku found for {products_list[p]["name"]}')
+            
+        else: 
+            sku = products_list[p]['data'].get('sku')
+            new_sku = str(sku).replace(' ', '-')
+            print(f'sku check : {new_sku}')
+            kick = kicks.objects.get(sku=new_sku) # 없으면 여기서 에러 발생 -> except 로
+            print('Already exists') # 있으면 .
+            
         # TODO: 이미 등록된 제품이지만, 이미지 파일 업데이트 확인  module 로 빼기. 
-        result = 0
-        if products_list[p]['image']['original'] != '' and kick.imageUrl == '':
-            print('product image updated')
-            kick.imageUrl      = products_list[p]['image']['original']
-            kick.smallImageUrl = products_list[p]['image']['small']
-            kick.thumbUrl      = products_list[p]['image']['thumbnail']
+        # result = 0
+        # if products_list[p]['data']['image_url'] != '' and kick.imageUrl == '':
+        #     print('product image updated')
+        #     kick.imageUrl      = products_list[p]['data']['image_url']
             
-            result +=1
+        #     result +=1
             
-        if products_list[p]['releaseDate'] != '' and kick.releaseDate == '1900-00-00':
-            print(f'releaseDate update for {kick.name}')
-            kick.releaseDate = products_list[p]['releaseDate']
+        # if products_list[p]['data']['release_date'] != '' and kick.releaseDate == '1900-00-00':
+        #     print(f'releaseDate update for {kick.name}')
+        #     kick.releaseDate = products_list[p]['data']['data']['release_date']
             
-            result +=1
+        #     result +=1
             
-        if result >0:
-            kick.save()
-            return 1
+        # if result >0:
+        #     kick.save()
+        #     return 1
         
-        return 0
+            return 0
     except kicks.DoesNotExist: # 존재하지 않는 제품이므로, 등록 처리
         #TODO: 신제품 등록시 사진 파일도 저장 처리 
         print('New product')
+        sku = products_list[p]['data'].get('sku')
+        new_sku = str(sku).replace(' ', '-')
         kick = kicks(
-                    uuid                 = products_list[p]['_id'],
-                    brand                = products_list[p]['brand'],
-                    colorway             = products_list[p]['colorway'],                    
-                    gender               = products_list[p]['gender'],
-                    description          = products_list[p]['story'],
-                    name                 = products_list[p]['name'],
-                    releaseDate          = products_list[p]['releaseDate'],
-                    retailPrice          = products_list[p]['retailPrice'],
-                    estimatedMarketValue = products_list[p]['estimatedMarketValue'],
-                    sku                  = products_list[p]['sku'],
-                    imageUrl             = products_list[p]['image']['original'],
-                    smallImageUrl        = products_list[p]['image']['small'],
-                    thumbUrl             = products_list[p]['image']['thumbnail'],
+                    uuid                 = products_list[p]['data'].get('id'),
+                    name                 = products_list[p].get('value'),
+                    category             = products_list[p]['data'].get('category'),
+                    product_type         = products_list[p]['data'].get('product_type'),
+                    colorway             = products_list[p]['data'].get('color'),                  
+                    releaseDate          = products_list[p]['data'].get('release_date'),
+                    release_date_year    = products_list[p]['data'].get('release_date_year'),
+                    retailPrice          = products_list[p]['data'].get('retail_price_cents'),
+                    retailPriceKrw       = products_list[p]['data'].get('retail_price_cents_krw'),
+                    sku                  = new_sku,
+                    imageUrl             = products_list[p]['data'].get('image_url'),
+                    slug                 = products_list[p]['data'].get('slug')
+
             )
         kick.save()
         
@@ -366,3 +416,28 @@ def google_img_download(request):
 
     
     return HttpResponse(status.HTTP_201_CREATED)
+
+def duplicate_check(request):
+    # q = Q()
+    # q.add(Q(name__icontains='fear'))
+    # all_products = kicks.objects.filter(name)
+    all_products = kicks.objects.filter(Q(name__icontains='fear')).order_by('-releaseDate')
+    for p in all_products:
+        sku = p.sku
+        # print(f'sku check : {sku}')
+        if not sku :
+            print(f'sku is NULL')
+        else: 
+            if sku.find('-') != -1:
+                print(f'sku check "-" 있음: {sku}, {p.name}')
+                new_sku = sku.replace('-', ' ')
+                # print(f'sku "-".strip : {new_sku}')
+                duplicate = kicks.objects.filter(sku=new_sku)
+                if duplicate :
+                    print(f'sku duplicate : {duplicate[0].sku}')
+                    print(f'sku duplicate : {duplicate[0].name}')
+                    duplicate.delete()
+            # else:
+            #     print(f'sku check 없음 : {sku}')
+            
+    return HttpResponse(status.HTTP_200_OK)

@@ -18,8 +18,10 @@ from cultureSupply.settings import SECRET_KEY
 @api_view(['GET', 'POST', 'PUT',])
 def userInfo(request, user_pk):
     user = get_object_or_404(User, pk=user_pk)
+    userInfo = get_object_or_404(UserInfo, user=user)
     if request.method == 'GET':
-        pass
+        serializer = UserInfoSerializer(userInfo)
+        return JsonResponse(serializer.data, safe=False)
     elif request.method == 'POST':
         print(f'request.POST: {request.POST}')
         serializer = UserInfoSerializer(data=request.data)

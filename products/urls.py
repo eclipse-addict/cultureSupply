@@ -12,6 +12,9 @@ urlpatterns = [
     path('test/', views.google_img_download),
     path('popular/', views.popular_release),
     path('img/pasing/', views.sneaker_img_paser),
+    path('goat/', views.get_goat),
+    path('dup/', views.duplicate_check)
+    
     
 
 ] 

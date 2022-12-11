@@ -53,14 +53,16 @@ class UserInfo(models.Model):
     ('290', 280), ('300', 300), ('300', 300), ('310', 310),
     
     
-    first_name = models.CharField(max_length=200, default='', blank=True, null=True)
-    last_name  = models.CharField(max_length=200, default='', blank=True, null=True)
-    nick_name  = models.CharField(max_length=200, default='', blank=True, null=True)
+    first_name  = models.CharField(max_length=200, default='', blank=True, null=True)
+    last_name   = models.CharField(max_length=200, default='', blank=True, null=True)
+    nick_name   = models.CharField(max_length=200, default='', blank=True, null=True)
+    profile_img = models.ImageField(upload_to='user/', blank=True, null=True, default='media/images/user.png')
     
-    gender     = models.CharField(max_length=10, default= '', null=True, blank=True)
-    shoeSize   = models.CharField(max_length=10, default= '', null=True, blank=True)
-    topSize    = models.CharField(max_length=10, default= '', null=True, blank=True)
-    bottomSize = models.CharField(max_length=10, default= '', null=True, blank=True)
+    gender      = models.CharField(max_length=10, default= '', null=True, blank=True)
+    shoeSize    = models.CharField(max_length=10, default= '', null=True, blank=True)
+    topSize     = models.CharField(max_length=10, default= '', null=True, blank=True)
+    bottomSize  = models.CharField(max_length=10, default= '', null=True, blank=True)
     
-    zipCode    = models.CharField(max_length=100, blank=True, null=True)
-    address    = models.CharField(max_length=1500, blank=True, null=True)
+    zipCode     = models.CharField(max_length=100, blank=True, null=True)
+    address     = models.CharField(max_length=1500, blank=True, null=True)
+    
