@@ -13,6 +13,7 @@ urlpatterns = [
     path('popular/', views.popular_release),
     path('img/pasing/', views.sneaker_img_paser),
     path('goat/', views.get_goat),
+    path('goat/pop/', views.goat_popular_release_recent_kicks),
     path('dup/', views.duplicate_check)
     
     

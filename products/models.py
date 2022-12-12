@@ -6,7 +6,7 @@ class kicks(models.Model):
     # uuid that stock asigned for this product 
     # it's used to determine whether it's already in stock on the database
     uuid                 = models.CharField(max_length=100, )# goat
-    brand                = models.CharField(max_length=100, )
+    brand                = models.CharField(max_length=100,null=True, blank=True, )
     category             = models.CharField(max_length=100,null=True, blank=True,) # goat
     product_type         = models.CharField(max_length=300,null=True, blank=True,)  # goat
     colorway             = models.CharField(max_length=150, null=True, blank=True,)# goat
@@ -22,7 +22,7 @@ class kicks(models.Model):
     retailPriceKrw       = models.PositiveBigIntegerField(null=True, blank=True, default=0)# goat
     estimatedMarketValue = models.PositiveBigIntegerField(default=0)# goat
     title                = models.CharField(max_length=300, )
-    sku                  = models.CharField(max_length=200, default=' ', null=True, blank=True,) # ex) 555088-101# goat
+    sku                  = models.CharField(max_length=200, default=' ', null=True, blank=True, unique=True) # ex) 555088-101# goat
     slug                 = models.CharField(max_length=500, default='',null=True, blank=True,)# goat
     imageUrl             = models.CharField(max_length=500, null=True, blank=True,)# goat
     smallImageUrl        = models.CharField(max_length=500, )
