@@ -153,26 +153,52 @@ goat_headers = {
 new_release_url = getattr(settings, 'NEW_RELEASE_URL', None)
 
 
-def goat_popular_release_recent_kicks(request):
+
+# TODO: 카테고리 별 제품 파싱 :
+# Sneakers : 1968 ~ 2023
+# T-Shirts : 1990 ~ 2023 
+# Apparel : 1970 ~ 2023
+# Hoodies : 2018 ~ 2022
+# Outerwear : 1982 ~ 2023
+# Bottoms : 1983 ~ 2023
+# Bags : 1999 ~ 2023
+# Jewelry : 1969 ~ 2023
+
+def goat_collections(request):
     start = time.time()
     new_cnt = 0
-    for i in range(1, 300):
-        popular_release = f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=11&page={i}&num_results_per_page=200&sort_by=relevance&sort_order=descending&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670821087867'
-        recent_kicks = f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=11&page={i}&num_results_per_page=200&filters[recently_released]=sneakers&sort_by=release_date&sort_order=descending&fmt_options[hidden_fields]=gp_lowest_price_cents_3&fmt_options[hidden_fields]=gp_instant_ship_lowest_price_cents_3&fmt_options[hidden_facets]=gp_lowest_price_cents_3&fmt_options[hidden_facets]=gp_instant_ship_lowest_price_cents_3&_dt=1670822296441'
-        recent_apparel = f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=11&page={i}&num_results_per_page=200&filters[recently_released]=apparel&sort_by=date_added&sort_order=descending&fmt_options[hidden_fields]=gp_lowest_price_cents_3&fmt_options[hidden_fields]=gp_instant_ship_lowest_price_cents_3&fmt_options[hidden_facets]=gp_lowest_price_cents_3&fmt_options[hidden_facets]=gp_instant_ship_lowest_price_cents_3&_dt=1670822445157'
-        response = requests.get(url=recent_apparel, headers=goat_headers)
-        print('res: ', response.status_code)
-        # print('res: ', response.text)
-        json_data = json.loads(response.text)
-        products_list = json_data.get('response').get('results')
-        if not products_list:
-            print(f'No more products found finished at page : {i}page.')
-            break
-        for p in range(len(products_list)):
-            brand = products_list[i]['data'].get('brand')
-            new_cnt += create_new_kick_data(products_list, p, brand)
+    
+    for j in range(5):
+        for i in range(1, 200):
+            url_list = [ 
+            # f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=11&page={i}&num_results_per_page=200&sort_by=relevance&sort_order=descending&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670821087867',
+            # f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=11&page={i}&num_results_per_page=200&filters[recently_released]=sneakers&sort_by=release_date&sort_order=descending&fmt_options[hidden_fields]=gp_lowest_price_cents_3&fmt_options[hidden_fields]=gp_instant_ship_lowest_price_cents_3&fmt_options[hidden_facets]=gp_lowest_price_cents_3&fmt_options[hidden_facets]=gp_instant_ship_lowest_price_cents_3&_dt=1670822296441',
+            # f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=11&page={i}&num_results_per_page=200&filters[recently_released]=apparel&sort_by=date_added&sort_order=descending&fmt_options[hidden_fields]=gp_lowest_price_cents_3&fmt_options[hidden_fields]=gp_instant_ship_lowest_price_cents_3&fmt_options[hidden_facets]=gp_lowest_price_cents_3&fmt_options[hidden_facets]=gp_instant_ship_lowest_price_cents_3&_dt=1670822445157',
+            f'https://ac.cnstrc.com/browse/collection_id/new-arrivals-apparel?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=12&page={i}&num_results_per_page=200&filters%5Bproduct_condition%5D=new_no_defects&sort_by=relevance&sort_order=descending&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670910536899',
+            f'https://ac.cnstrc.com/browse/collection_id/just-dropped?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=12&page={i}&num_results_per_page=200&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670910906505',
+            f'https://ac.cnstrc.com/browse/collection_id/women-s-sneakers?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=12&page={i}&num_results_per_page=200&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670910951588',
+            f'https://ac.cnstrc.com/browse/collection_id/toddler?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=12&page={i}&num_results_per_page=200&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670910987178',
+            f'https://ac.cnstrc.com/browse/collection_id/most-wanted-new?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=12&page={i}&num_results_per_page=200&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670911039677',]
+            
+            url_list_name =['popular_release', 'recent_kicks', 'recent_apparel', 'newe_in', 'just_drop', 'womens', 'toddler', 'most_wanted',]
+            
+            response = requests.get(url=url_list[j], headers=goat_headers)
+            print('res: ', response.status_code)
+            # print('res: ', response.text)
+            json_data = json.loads(response.text)
+            products_list = json_data.get('response').get('results')
+            
+            if not products_list:
+                print(f'No more products on {url_list_name[j]} found finished at page : {i}page.')
+                break
+            
+            for p in range(len(products_list)):
+                brand = products_list[i]['data'].get('brand')
+                new_cnt += create_new_kick_data(products_list, p, brand)
+            
     print(f'total New product count = {new_cnt}')
     print(f'time check : {time.time() - start}')
+    
     return HttpResponse(status=status.HTTP_201_CREATED)
 # 284,361 /200 = // current 21 page 
 def get_goat(request):
@@ -224,14 +250,29 @@ def create_new_kick_data(products_list, p, brand):
             print('Already exists') # 있으면 .
             
             result = 0
-            if not kick.brand:
-                print(f'product brand updated : {kick.name}')
-                kick.brand = brand
-                result +=1
             
-            if result >0:
-                kick.save()
-                return 1
+            # if not kick.brand:
+            #     print(f'product brand updated : {kick.name}')
+            #     kick.brand = brand
+            #     result =1
+            
+            # if not kick.category:
+            #     print(f'product category updated : {kick.name}')
+            #     kick.category = products_list[p]['data'].get('category')
+            #     result =1
+                
+            # if not kick.product_type:
+            #     print(f'product product_type updated : {kick.name}')
+            #     kick.product_type = products_list[p]['data'].get('product_type')
+            #     result =1
+            
+            # print(f'product retailPrice updated : {kick.name}')
+            # kick.retailPrice = products_list[p]['data'].get('retail_price_cents')
+            # result = 1                            
+
+            # if result >0:
+            #     kick.save()
+            #     return 1
         
             return 0
     except kicks.DoesNotExist: # 존재하지 않는 제품이므로, 등록 처리
@@ -317,13 +358,15 @@ def sneaker_data_by_brand_paser(request):
 #update Count : 4849
 def sneaker_img_paser(request):
     start = time.time()
+    count = 0
     # 이미 추가한 것 필터로 빼고 갖고오기..
-    all_products = kicks.objects.filter(local_imageUrl='http://localhost:8000/media/images/defaultImg.png').order_by('-releaseDate')
+    all_products = kicks.objects.filter(local_imageUrl='http://localhost:8000/media/images/defaultImg.png').exclude(imageUrl__isnull=True).order_by('-releaseDate')
     
     for i, p in enumerate(all_products):
         
         if p.imageUrl!='' and p.imageUrl.find('stockx')== -1:
             print(f'Name check (goat):{p.id} {p.name}')
+            print(f'URL Check:{p.imageUrl}')
             imageUrl = p.imageUrl
             # path = os.path.dirname(imageUrl)[22:]
             # 저장 경로 
@@ -340,39 +383,39 @@ def sneaker_img_paser(request):
             img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
             p.local_imageUrl = img_url
             ################################################################################################
-            smallImageUrl = p.smallImageUrl
-            # 저장 할 제품 이름
-            file_name = os.path.basename(smallImageUrl)
-            path = urlparse(smallImageUrl).path
-            path_url = path[:path.find(file_name)]
+            # smallImageUrl = p.smallImageUrl
+            # # 저장 할 제품 이름
+            # file_name = os.path.basename(smallImageUrl)
+            # path = urlparse(smallImageUrl).path
+            # path_url = path[:path.find(file_name)]
             # 저장 경로 
             local_path = '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers'+path_url
             # 디렉토리가 없으면 생성
             # check_dir(local_path)
             # 설정한 경로에 파일 저장 
-            req.urlretrieve(smallImageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
-            # 해당 제품 db 업데이트
-            small_img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
-            p.local_smallImageUrl = small_img_url
+            # req.urlretrieve(smallImageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
+            # # 해당 제품 db 업데이트
+            # small_img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
+            # p.local_smallImageUrl = small_img_url
             ################################################################################################
-            thumbUrl = p.thumbUrl
-            # 저장 할 제품 이름
-            file_name = os.path.basename(thumbUrl)
-            path = urlparse(thumbUrl).path
-            path_url = path[:path.find(file_name)]
+            # thumbUrl = p.thumbUrl
+            # # 저장 할 제품 이름
+            # file_name = os.path.basename(thumbUrl)
+            # path = urlparse(thumbUrl).path
+            # path_url = path[:path.find(file_name)]
             # 저장 경로 
-            local_path = '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers'+path
-            # 디렉토리가 없으면 생성
-            # check_dir(local_path)
-            # 설정한 경로에 파일 저장 
-            req.urlretrieve(thumbUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
-            # 해당 제품 db 업데이트
-            thumb_Url_img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
+            # local_path = '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers'+path
+            # # 디렉토리가 없으면 생성
+            # # check_dir(local_path)
+            # # 설정한 경로에 파일 저장 
+            # req.urlretrieve(thumbUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
+            # # 해당 제품 db 업데이트
+            # thumb_Url_img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
 
-            p.local_thumbUrl = thumb_Url_img_url
+            # p.local_thumbUrl = thumb_Url_img_url
             # 최종 저장 
             p.save()
-            print(f'update Count : {i}')
+            count +=1
         # Stockx url 일 경우, 
         elif p.imageUrl!='' and p.imageUrl.find('stockx') >= 0:
             print(f'Name check (stockX) : {p.name}')
@@ -399,8 +442,8 @@ def sneaker_img_paser(request):
             img_url = 'http://localhost:8000/media/images/sneakers/'+file_name[:file_name.find('?')]
             p.local_imageUrl = img_url
             p.save()
-            print(f'update Count : {i}')
-    print(f'1000 product time check : {time.time() - start}')
+            count +=1
+    print(f'{time.time() - start}')
     return HttpResponse(status= status.HTTP_200_OK)
 
 def check_dir(local_path):
@@ -443,7 +486,8 @@ def duplicate_check(request):
     # q = Q()
     # q.add(Q(name__icontains='fear'))
     # all_products = kicks.objects.filter(name)
-    all_products = kicks.objects.filter(Q(name__icontains='fear')).order_by('-releaseDate')
+    # all_products = kicks.objects.filter(Q(name__icontains='fear')).order_by('-releaseDate')
+    all_products = kicks.objects.all().exclude(sku__isnull=True).order_by('-releaseDate')
     for p in all_products:
         sku = p.sku
         # print(f'sku check : {sku}')
@@ -452,7 +496,7 @@ def duplicate_check(request):
         else: 
             if sku.find('-') != -1:
                 print(f'sku check "-" 있음: {sku}, {p.name}')
-                new_sku = sku.replace('-', ' ')
+                new_sku = sku.replace('-', ' ') # 하이픈 없앤 형태로 중복 체크 
                 # print(f'sku "-".strip : {new_sku}')
                 duplicate = kicks.objects.filter(sku=new_sku)
                 if duplicate :
