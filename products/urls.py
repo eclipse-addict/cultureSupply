@@ -5,6 +5,7 @@ urlpatterns = [
     path('img/main/', views.main_img),
     path('sneaker/', views.get_sneaker),
     path('sneaker/<int:id>/', views.get_detail),
+    path('sneaker/like/<int:product_id>/<int:user_id>/', views.product_like),
     
     # urls for admin
     path('new/', views.new_release_paser),

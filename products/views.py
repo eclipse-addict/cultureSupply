@@ -1,5 +1,6 @@
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.db.models import Q
+from django.contrib.auth import get_user, get_user_model
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -22,6 +23,10 @@ from yarl import URL
 from google_images_download import google_images_download   #importing the library
 from bs4 import BeautifulSoup
 from assets.brand_list import brand_list
+
+
+User =  User = get_user_model()
+
 
 '''
 returns 15 most recent drops (no paginations) -> for main page component
@@ -111,6 +116,33 @@ def get_detail(request, id):
     return JsonResponse(serializer.data, safe=False)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def product_like(request, product_id, user_id):
+    user = User.objects.get(pk=user_id)
+    kick = kicks.objects.get(id=product_id)
+    
+    if kick.like_users.filter(id=user_id).exists():
+            kick.like_users.remove(user)
+            return JsonResponse({'message':'removed'}, status = status.HTTP_200_OK)
+    else:
+        kick.like_users.add(user)
+        return JsonResponse({'message':'added'}, status = status.HTTP_200_OK)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 '''
 sneakers Data paser v1.0.0
@@ -168,12 +200,12 @@ def goat_collections(request):
     start = time.time()
     new_cnt = 0
     
-    for j in range(5):
+    for j in range(7):
         for i in range(1, 200):
             url_list = [ 
             # f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=11&page={i}&num_results_per_page=200&sort_by=relevance&sort_order=descending&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670821087867',
-            # f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=11&page={i}&num_results_per_page=200&filters[recently_released]=sneakers&sort_by=release_date&sort_order=descending&fmt_options[hidden_fields]=gp_lowest_price_cents_3&fmt_options[hidden_fields]=gp_instant_ship_lowest_price_cents_3&fmt_options[hidden_facets]=gp_lowest_price_cents_3&fmt_options[hidden_facets]=gp_instant_ship_lowest_price_cents_3&_dt=1670822296441',
-            # f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=11&page={i}&num_results_per_page=200&filters[recently_released]=apparel&sort_by=date_added&sort_order=descending&fmt_options[hidden_fields]=gp_lowest_price_cents_3&fmt_options[hidden_fields]=gp_instant_ship_lowest_price_cents_3&fmt_options[hidden_facets]=gp_lowest_price_cents_3&fmt_options[hidden_facets]=gp_instant_ship_lowest_price_cents_3&_dt=1670822445157',
+            f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=11&page={i}&num_results_per_page=200&filters[recently_released]=sneakers&sort_by=release_date&sort_order=descending&fmt_options[hidden_fields]=gp_lowest_price_cents_3&fmt_options[hidden_fields]=gp_instant_ship_lowest_price_cents_3&fmt_options[hidden_facets]=gp_lowest_price_cents_3&fmt_options[hidden_facets]=gp_instant_ship_lowest_price_cents_3&_dt=1670822296441',
+            f'https://ac.cnstrc.com/browse/group_id/all?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=11&page={i}&num_results_per_page=200&filters[recently_released]=apparel&sort_by=date_added&sort_order=descending&fmt_options[hidden_fields]=gp_lowest_price_cents_3&fmt_options[hidden_fields]=gp_instant_ship_lowest_price_cents_3&fmt_options[hidden_facets]=gp_lowest_price_cents_3&fmt_options[hidden_facets]=gp_instant_ship_lowest_price_cents_3&_dt=1670822445157',
             f'https://ac.cnstrc.com/browse/collection_id/new-arrivals-apparel?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=12&page={i}&num_results_per_page=200&filters%5Bproduct_condition%5D=new_no_defects&sort_by=relevance&sort_order=descending&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670910536899',
             f'https://ac.cnstrc.com/browse/collection_id/just-dropped?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=12&page={i}&num_results_per_page=200&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670910906505',
             f'https://ac.cnstrc.com/browse/collection_id/women-s-sneakers?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=12&page={i}&num_results_per_page=200&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670910951588',
