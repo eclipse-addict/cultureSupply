@@ -225,7 +225,7 @@ def goat_collections(request):
                 break
             
             for p in range(len(products_list)):
-                brand = products_list[i]['data'].get('brand')
+                brand = products_list[p]['data'].get('brand')
                 new_cnt += create_new_kick_data(products_list, p, brand)
             
     print(f'total New product count = {new_cnt}')
