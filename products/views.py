@@ -69,25 +69,32 @@ def get_sneaker(request):
     page = request.GET.get("page")
     keyword = request.GET.get("keyword")
     brand = request.GET.get("brand")
+    release = request.GET.get("release")
     # release = request.GET.get("release")
     
     if brand != 'All':
         brand = brand.split(',')
     # release = release.split(',')
     
-    # print(f'asdfasdfasdfasdfasdfasdfasf{release}')
-    # 빈 문자열 || gender, brand 가 All => 전체 검색 
+    if release != 'default':
+        release = release.split(',')
+        
     sneaker_list = None
     paginator = None
     q = Q()
     today = date.today()
-    if keyword == '' and brand == 'All':
-        print(f'asdfasdfasdfasdfasdfas')
+    
+    if keyword == '' and brand == 'All' and release =='default':
         sneaker_list = kicks.objects.filter(releaseDate__range=[date.today() - timedelta(days=15), date.today() + timedelta(days=15)]).all().order_by('-releaseDate')
     else:
     #키워드 설정     
         if keyword != '':
             q.add(Q(name__icontains=keyword), q.AND)
+        elif release != 'default':
+            if len(release) == 2:
+                q.add(Q(releaseDate__range=[release[0], release[1]]), q.AND)
+            elif len(release) == 1:
+                q.add(Q(releaseDate=release[0]), q.AND)
         elif brand != 'All':
             for b in brand:
                 q.add(Q(brand__icontains=b), q.OR)
