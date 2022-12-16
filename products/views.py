@@ -68,26 +68,29 @@ TODO: Searching function needs to be added.
 def get_sneaker(request): 
     page = request.GET.get("page")
     keyword = request.GET.get("keyword")
-    gender = request.GET.get("gender")
     brand = request.GET.get("brand")
+    # release = request.GET.get("release")
     
+    if brand != 'All':
+        brand = brand.split(',')
+    # release = release.split(',')
+    
+    # print(f'asdfasdfasdfasdfasdfasdfasf{release}')
     # 빈 문자열 || gender, brand 가 All => 전체 검색 
     sneaker_list = None
     paginator = None
     q = Q()
     today = date.today()
-    if keyword == '' and gender == 'All' and brand == 'All':
+    if keyword == '' and brand == 'All':
+        print(f'asdfasdfasdfasdfasdfas')
         sneaker_list = kicks.objects.filter(releaseDate__range=[date.today() - timedelta(days=15), date.today() + timedelta(days=15)]).all().order_by('-releaseDate')
     else:
-    #키워드 설정     Q(original_title__contains=search_word) | Q(title__contains=search_word)
+    #키워드 설정     
         if keyword != '':
             q.add(Q(name__icontains=keyword), q.AND)
-        elif gender != 'All':
-            print(f'gender {gender}')
-            q.add(Q(gender__icontains=gender), q.AND)
         elif brand != 'All':
-            print(f'brand!!! {brand}')
-            q.add(Q(brand__icontains=brand), q.AND)
+            for b in brand:
+                q.add(Q(brand__icontains=b), q.OR)
 
         sneaker_list = kicks.objects.filter(q).order_by('-releaseDate')
     
@@ -288,6 +291,23 @@ def create_new_kick_data(products_list, p, brand):
             #     kick.brand = brand
             #     result =1
             
+            if not kick.releaseDate:
+                print(f'product releaseDate updated : {kick.name}')
+                if not products_list[p]['data'].get('release_date'):
+                    print(f'No release date found for {products_list[p].get("name")}')
+                else:
+                    kick.releaseDate = products_list[p]['data'].get('release_date') 
+                    result =1
+            
+            if kick.releaseDate == '1900-00-00':
+                print(f'product releaseDate updated : {kick.name}')
+                if not products_list[p]['data'].get('release_date'):
+                    print(f'No release date found for {products_list[p].get("name")}')
+                else:
+                    kick.releaseDate = products_list[p]['data'].get('release_date') 
+                    result =1
+                
+            
             # if not kick.category:
             #     print(f'product category updated : {kick.name}')
             #     kick.category = products_list[p]['data'].get('category')
@@ -302,9 +322,9 @@ def create_new_kick_data(products_list, p, brand):
             # kick.retailPrice = products_list[p]['data'].get('retail_price_cents')
             # result = 1                            
 
-            # if result >0:
-            #     kick.save()
-            #     return 1
+            if result >0:
+                kick.save()
+                return 1
         
             return 0
     except kicks.DoesNotExist: # 존재하지 않는 제품이므로, 등록 처리
@@ -409,45 +429,51 @@ def sneaker_img_paser(request):
             
             # 디렉토리가 없으면 생성
             # check_dir(local_path)
-            # 설정한 경로에 파일 저장 
-            req.urlretrieve(imageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
-            # 해당 제품 db 업데이트
-            img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
-            p.local_imageUrl = img_url
-            ################################################################################################
-            # smallImageUrl = p.smallImageUrl
-            # # 저장 할 제품 이름
-            # file_name = os.path.basename(smallImageUrl)
-            # path = urlparse(smallImageUrl).path
-            # path_url = path[:path.find(file_name)]
-            # 저장 경로 
-            local_path = '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers'+path_url
-            # 디렉토리가 없으면 생성
-            # check_dir(local_path)
-            # 설정한 경로에 파일 저장 
-            # req.urlretrieve(smallImageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
-            # # 해당 제품 db 업데이트
-            # small_img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
-            # p.local_smallImageUrl = small_img_url
-            ################################################################################################
-            # thumbUrl = p.thumbUrl
-            # # 저장 할 제품 이름
-            # file_name = os.path.basename(thumbUrl)
-            # path = urlparse(thumbUrl).path
-            # path_url = path[:path.find(file_name)]
-            # 저장 경로 
-            # local_path = '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers'+path
-            # # 디렉토리가 없으면 생성
-            # # check_dir(local_path)
-            # # 설정한 경로에 파일 저장 
-            # req.urlretrieve(thumbUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
-            # # 해당 제품 db 업데이트
-            # thumb_Url_img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
+            # 설정한 경로에 파일 저장
+            try:                
+                req.urlretrieve(imageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
+                # 해당 제품 db 업데이트
+                img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
+                p.local_imageUrl = img_url
+                ################################################################################################
+                # smallImageUrl = p.smallImageUrl
+                # # 저장 할 제품 이름
+                # file_name = os.path.basename(smallImageUrl)
+                # path = urlparse(smallImageUrl).path
+                # path_url = path[:path.find(file_name)]
+                # 저장 경로 
+                local_path = '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers'+path_url
+                # 디렉토리가 없으면 생성
+                # check_dir(local_path)
+                # 설정한 경로에 파일 저장 
+                # req.urlretrieve(smallImageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
+                # # 해당 제품 db 업데이트
+                # small_img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
+                # p.local_smallImageUrl = small_img_url
+                ################################################################################################
+                # thumbUrl = p.thumbUrl
+                # # 저장 할 제품 이름
+                # file_name = os.path.basename(thumbUrl)
+                # path = urlparse(thumbUrl).path
+                # path_url = path[:path.find(file_name)]
+                # 저장 경로 
+                # local_path = '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers'+path
+                # # 디렉토리가 없으면 생성
+                # # check_dir(local_path)
+                # # 설정한 경로에 파일 저장 
+                # req.urlretrieve(thumbUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
+                # # 해당 제품 db 업데이트
+                # thumb_Url_img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
 
-            # p.local_thumbUrl = thumb_Url_img_url
-            # 최종 저장 
-            p.save()
-            count +=1
+                # p.local_thumbUrl = thumb_Url_img_url
+                # 최종 저장 
+                p.save()
+                count +=1
+            except:
+                print(f'Error occured')
+                p.imageUrl = 'http://localhost:8000/media/images/defaultImg.png'
+                p.save()
+                
         # Stockx url 일 경우, 
         elif p.imageUrl!='' and p.imageUrl.find('stockx') >= 0:
             print(f'Name check (stockX) : {p.name}')
@@ -469,12 +495,18 @@ def sneaker_img_paser(request):
             # 디렉토리가 없으면 생성
             # check_dir(local_path)
             # 설정한 경로에 파일 저장 
-            req.urlretrieve(imageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name[:file_name.find('?')])
-            # 해당 제품 db 업데이트
-            img_url = 'http://localhost:8000/media/images/sneakers/'+file_name[:file_name.find('?')]
-            p.local_imageUrl = img_url
-            p.save()
-            count +=1
+            try:                
+                req.urlretrieve(imageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name[:file_name.find('?')])
+                # 해당 제품 db 업데이트
+                img_url = 'http://localhost:8000/media/images/sneakers/'+file_name[:file_name.find('?')]
+                p.local_imageUrl = img_url
+                p.save()
+                count +=1
+            except:
+                print(f'Error occured')
+                p.imageUrl = 'http://localhost:8000/media/images/defaultImg.png'
+                p.save()
+                
     print(f'{time.time() - start}')
     return HttpResponse(status= status.HTTP_200_OK)
 
