@@ -49,9 +49,6 @@ class ProductListViewSet(generics.ListAPIView):
         queryset = kicks.objects.all()
         brand = self.request.GET.get('brand', None)
         releaseDate = self.request.GET.get('releaseDate', None)
-        
-        if brand:
-            queryset = queryset.filter(Q(brand=brand))
             
         if releaseDate:
             release = releaseDate.split(',')
@@ -59,9 +56,17 @@ class ProductListViewSet(generics.ListAPIView):
                 queryset = queryset.filter(Q(releaseDate__range=[release[0], release[1]]))
             elif len(release) == 1:
                 queryset = queryset.filter(Q(releaseDate=release[0]))    
-                
+        else: 
+            queryset = queryset.filter(Q(releaseDate__range=[date.today() - timedelta(days=15), date.today() + timedelta(days=15)]))
+        
+        if brand:
+            brand = brand.split(',')
+            q = Q()
+            for b in brand:
+                q.add(Q(brand__icontains=b), q.OR)
+            queryset = queryset.filter(q)    
         return queryset
-    
+
 
 '''
 returns 15 most recent drops (no paginations) -> for main page component
