@@ -1,13 +1,18 @@
 from django.shortcuts import get_list_or_404, get_object_or_404
-from django.db.models import Q
 from django.contrib.auth import get_user, get_user_model
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework import status
-from .serializers import kicksSerializer
 from django.conf import settings
+from django.db.models import Q
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.pagination import PageNumberPagination, CursorPagination
+from rest_framework import status
+from rest_framework import generics
+from rest_framework import filters
+from .serializers import kicksSerializer
 from .models import kicks
 from datetime import date, timedelta
 import pprint
@@ -18,15 +23,45 @@ from urllib.parse import urlparse
 import chardet
 import os
 import time
-import shutil
 from yarl import URL
 from google_images_download import google_images_download   #importing the library
 from bs4 import BeautifulSoup
 from assets.brand_list import brand_list
 
-
 User =  User = get_user_model()
 
+
+class ProductPagination(CursorPagination):
+    page_size = 20
+    page_size_query_param = None
+    max_page_size = 20
+    ordering = '-releaseDate'
+
+class ProductListViewSet(generics.ListAPIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    queryset = kicks.objects.all()
+    serializer_class = kicksSerializer
+    pagination_class = ProductPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['$name']
+    
+    def get_queryset(self):
+        queryset = kicks.objects.all()
+        brand = self.request.GET.get('brand', None)
+        releaseDate = self.request.GET.get('releaseDate', None)
+        
+        if brand:
+            queryset = queryset.filter(Q(brand=brand))
+            
+        if releaseDate:
+            release = releaseDate.split(',')
+            if len(release) == 2:
+                queryset = queryset.filter(Q(releaseDate__range=[release[0], release[1]]))
+            elif len(release) == 1:
+                queryset = queryset.filter(Q(releaseDate=release[0]))    
+                
+        return queryset
+    
 
 '''
 returns 15 most recent drops (no paginations) -> for main page component
@@ -84,7 +119,7 @@ def get_sneaker(request):
     q = Q()
     today = date.today()
     
-    if keyword == '' and brand == 'All' and release =='default':
+    if keyword == '' and brand == 'All' and release =='default' or not release:
         sneaker_list = kicks.objects.filter(releaseDate__range=[date.today() - timedelta(days=15), date.today() + timedelta(days=15)]).all().order_by('-releaseDate')
     else:
     #키워드 설정     
@@ -315,19 +350,25 @@ def create_new_kick_data(products_list, p, brand):
                     result =1
                 
             
-            # if not kick.category:
-            #     print(f'product category updated : {kick.name}')
-            #     kick.category = products_list[p]['data'].get('category')
-            #     result =1
+            if not kick.category:
+                print(f'product category updated : {kick.name}')
+                kick.category = products_list[p]['data'].get('category')
+                result =1
                 
-            # if not kick.product_type:
-            #     print(f'product product_type updated : {kick.name}')
-            #     kick.product_type = products_list[p]['data'].get('product_type')
-            #     result =1
+            if not kick.product_type:
+                print(f'product product_type updated : {kick.name}')
+                kick.product_type = products_list[p]['data'].get('product_type')
+                result =1
             
-            # print(f'product retailPrice updated : {kick.name}')
-            # kick.retailPrice = products_list[p]['data'].get('retail_price_cents')
-            # result = 1                            
+            if not kick.retailPrice:
+                print(f'product retailPrice updated : {kick.name}')
+                kick.retailPrice = products_list[p]['data'].get('retail_price_cents')
+                result = 1        
+                                    
+            if not kick.imageUrl:
+                print(f'product image_url updated : {kick.name}')
+                kick.imageUrl = products_list[p]['data'].get('image_url')
+                result = 1                            
 
             if result >0:
                 kick.save()
