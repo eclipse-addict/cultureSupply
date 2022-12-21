@@ -56,15 +56,17 @@ class ProductListViewSet(generics.ListAPIView):
                 queryset = queryset.filter(Q(releaseDate__range=[release[0], release[1]]))
             elif len(release) == 1:
                 queryset = queryset.filter(Q(releaseDate=release[0]))    
-        else: 
-            queryset = queryset.filter(Q(releaseDate__range=[date.today() - timedelta(days=15), date.today() + timedelta(days=15)]))
+        # else: 
         
         if brand:
             brand = brand.split(',')
             q = Q()
             for b in brand:
                 q.add(Q(brand__icontains=b), q.OR)
-            queryset = queryset.filter(q)    
+            queryset = queryset.filter(q)
+        else: 
+            queryset = queryset.filter(Q(releaseDate__range=[date.today() - timedelta(days=15), date.today() + timedelta(days=15)]))
+            
         return queryset
 
 
@@ -356,24 +358,34 @@ def create_new_kick_data(products_list, p, brand):
                 
             
             if not kick.category:
-                print(f'product category updated : {kick.name}')
-                kick.category = products_list[p]['data'].get('category')
-                result =1
+                if products_list[p]['data'].get('category'):
+                    print(f'product category updated : {kick.name}')
+                    kick.category = products_list[p]['data'].get('category')
+                    result =1
                 
             if not kick.product_type:
-                print(f'product product_type updated : {kick.name}')
-                kick.product_type = products_list[p]['data'].get('product_type')
-                result =1
+                if products_list[p]['data'].get('product_type'):
+                    print(f'product product_type updated : {kick.name}')
+                    kick.product_type = products_list[p]['data'].get('product_type')
+                    result =1
             
             if not kick.retailPrice:
-                print(f'product retailPrice updated : {kick.name}')
-                kick.retailPrice = products_list[p]['data'].get('retail_price_cents')
-                result = 1        
+                if products_list[p]['data'].get('retail_price'):
+                    print(f'product retailPrice updated : {kick.name}')
+                    kick.retailPrice = products_list[p]['data'].get('retail_price')
+                    result = 1        
                                     
             if not kick.imageUrl:
-                print(f'product image_url updated : {kick.name}')
-                kick.imageUrl = products_list[p]['data'].get('image_url')
-                result = 1                            
+                if products_list[p]['data'].get('image_url'):
+                    print(f'product image_url updated : {kick.name}')
+                    kick.imageUrl = products_list[p]['data'].get('image_url')
+                    result = 1
+                                                
+            # if not kick.brand:
+            #     if products_list[p]['data'].get('brand'):
+            #         print(f'product brand updated : {kick.name}')
+            #         kick.imageUrl = products_list[p]['data'].get('brand')
+            #         result = 1                            
 
             if result >0:
                 kick.save()
