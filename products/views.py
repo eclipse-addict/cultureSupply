@@ -32,10 +32,10 @@ User =  User = get_user_model()
 
 
 class ProductPagination(CursorPagination):
-    page_size = 20
+    page_size = 10
     page_size_query_param = None
-    max_page_size = 20
-    ordering = '-releaseDate'
+    max_page_size = 10
+    ordering = '-releaseDate', 'id'
 
 class ProductListViewSet(generics.ListAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -56,7 +56,6 @@ class ProductListViewSet(generics.ListAPIView):
                 queryset = queryset.filter(Q(releaseDate__range=[release[0], release[1]]))
             elif len(release) == 1:
                 queryset = queryset.filter(Q(releaseDate=release[0]))    
-        # else: 
         
         if brand:
             brand = brand.split(',')
