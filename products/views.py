@@ -32,9 +32,9 @@ User =  User = get_user_model()
 
 
 class ProductPagination(CursorPagination):
-    page_size = 10
+    page_size = 20
     page_size_query_param = None
-    max_page_size = 10
+    max_page_size = 20
     ordering = '-releaseDate', 'id'
 
 class ProductListViewSet(generics.ListAPIView):
@@ -42,14 +42,19 @@ class ProductListViewSet(generics.ListAPIView):
     queryset = kicks.objects.all()
     serializer_class = kicksSerializer
     pagination_class = ProductPagination
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['$name']
+    # filter_backends = [filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend]
+    # search_fields = ['name']
     
     def get_queryset(self):
         queryset = kicks.objects.all()
+        search = self.request.GET.get('search')
         brand = self.request.GET.get('brand', None)
         releaseDate = self.request.GET.get('releaseDate', None)
-            
+        
+        if not releaseDate and not search and not brand :
+            queryset = queryset.filter(Q(releaseDate__range=[date.today() - timedelta(days=15), date.today() + timedelta(days=15)]))
+        
         if releaseDate:
             release = releaseDate.split(',')
             if len(release) == 2:
@@ -57,14 +62,23 @@ class ProductListViewSet(generics.ListAPIView):
             elif len(release) == 1:
                 queryset = queryset.filter(Q(releaseDate=release[0]))    
         
+        if search:
+            print(f'search check: {search}')
+            q = Q()
+            keyword = search.replace('+', ' ')
+            q.add(Q(name__icontains=keyword), q.OR)
+            q.add(Q(name__icontains=keyword.replace(' ','')), q.OR)
+            for word in search.split():
+                q.add(Q(name__icontains=word), q.OR)
+                
+            queryset = queryset.filter(q)
+            
         if brand:
             brand = brand.split(',')
             q = Q()
             for b in brand:
                 q.add(Q(brand__icontains=b), q.OR)
             queryset = queryset.filter(q)
-        else: 
-            queryset = queryset.filter(Q(releaseDate__range=[date.today() - timedelta(days=15), date.today() + timedelta(days=15)]))
             
         return queryset
 
