@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'raffleInfos',
     'products',
     'reviews',
+    'points',
     
     'bootstrap5',
     'imagekit',
