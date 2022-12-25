@@ -32,7 +32,7 @@ def create_userInfo(request, user_pk):
 
 
 @api_view(['GET','PUT'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def get_update_userInfo(request, user_pk):
     user = get_object_or_404(User, pk=user_pk)
     userInfo = get_object_or_404(UserInfo, user=user)
