@@ -27,6 +27,7 @@ def new_user_point(user_id):
         # 없으면 새로운 로우 생성. 
         new_point_row = Point(user = user, current_point = 1000)
         new_point_row.save()
+        create_point_history(1000, user, '회원가입', 'add')     
         
 
 
