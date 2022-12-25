@@ -37,10 +37,5 @@ if settings.DEBUG:
         path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
         path('__debug__/', include(debug_toolbar.urls)),
 
-
-        # path('accounts/', include('allauth.urls')),
-        # path('accounts/', include('accounts.urls')),
-        # path('articles/', include('articles.urls')),
-        # path('raffleInfos/', include('raffleInfos.urls')),
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

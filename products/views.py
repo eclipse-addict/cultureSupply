@@ -63,7 +63,6 @@ class ProductListViewSet(generics.ListAPIView):
                 queryset = queryset.filter(Q(releaseDate=release[0]))    
         
         if search:
-            print(f'search check: {search}')
             q = Q()
             keyword = search.replace('+', ' ')
             q.add(Q(name__icontains=keyword), q.OR)
@@ -114,60 +113,6 @@ def main_img(request):
     else:
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
-
-
-'''
-sneaker list v.0.1
-TODO: Searching function needs to be added. 
-'''
-def get_sneaker(request): 
-    page = request.GET.get("page")
-    keyword = request.GET.get("keyword")
-    brand = request.GET.get("brand")
-    release = request.GET.get("release")
-    # release = request.GET.get("release")
-    
-    if brand != 'All':
-        brand = brand.split(',')
-    # release = release.split(',')
-    
-    if release != 'default':
-        release = release.split(',')
-        
-    sneaker_list = None
-    paginator = None
-    q = Q()
-    today = date.today()
-    
-    if keyword == '' and brand == 'All' and release =='default' or not release:
-        sneaker_list = kicks.objects.filter(releaseDate__range=[date.today() - timedelta(days=15), date.today() + timedelta(days=15)]).all().order_by('-releaseDate')
-    else:
-    #키워드 설정     
-        if keyword != '':
-            q.add(Q(name__icontains=keyword), q.AND)
-        elif release != 'default':
-            if len(release) == 2:
-                q.add(Q(releaseDate__range=[release[0], release[1]]), q.AND)
-            elif len(release) == 1:
-                q.add(Q(releaseDate=release[0]), q.AND)
-        elif brand != 'All':
-            for b in brand:
-                q.add(Q(brand__icontains=b), q.OR)
-
-        sneaker_list = kicks.objects.filter(q).order_by('-releaseDate')
-    
-    if len(sneaker_list) >= 10:
-        paginator = Paginator(sneaker_list, 20)
-        
-    elif 0 < len(sneaker_list) < 10:
-        paginator = Paginator(sneaker_list, len(sneaker_list))
-    else:
-        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
-    
-    sneakers = paginator.get_page(page)
-    serializer = kicksSerializer(sneakers, many=True)
-        
-    return JsonResponse(serializer.data, safe=False)
 
 
 @api_view(['GET'])

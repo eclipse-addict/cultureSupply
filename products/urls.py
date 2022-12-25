@@ -3,7 +3,7 @@ from . import views
 from .views import ProductListViewSet
 urlpatterns = [
     path('img/main/', views.main_img),
-    path('sneaker/', views.get_sneaker),
+    # path('sneaker/', views.get_sneaker),
     path('sneaker/<int:id>/', views.get_detail),
     path('sneaker/like/<int:product_id>/<int:user_id>/', views.product_like),
     path('sneaker/list/', ProductListViewSet.as_view()),
