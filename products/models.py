@@ -34,4 +34,8 @@ class kicks(models.Model):
     
     like_users           = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_users', blank=True)
 
-    
+
+class productImg(models.Model):
+    product = models.ForeignKey(kicks, on_delete=models.CASCADE, related_name='productImg')
+    img_url = models.CharField(max_length=500, null=False, blank=False,)
+    type    = models.CharField(max_length=100, null=False, blank=False,) # main, left, right, back, top, front

@@ -18,6 +18,7 @@ from datetime import date, timedelta
 import pprint
 import requests
 import json
+import datetime
 import urllib.request as req
 from urllib.parse import urlparse
 import chardet
@@ -299,19 +300,43 @@ def create_new_kick_data(products_list, p, brand):
             #     result =1
             
             if not kick.releaseDate:
-                print(f'product releaseDate updated : {kick.name}')
                 if not products_list[p]['data'].get('release_date'):
                     print(f'No release date found for {products_list[p].get("name")}')
                 else:
-                    kick.releaseDate = products_list[p]['data'].get('release_date') 
+                    date_format = '%Y%m%d'
+                    release_Date = products_list[p]['data'].get('release_date'),
+                    #if releaseDate is not null format the date to YYYY-MM-DD
+                    release_Date = datetime.datetime.strptime(release_Date, date_format)
+                    release_Date = str(release_Date.date())
+                        
+                    kick.releaseDate = release_Date
+                    result =1
+                    
+            elif kick.releaseDate.find('-')==-1:
+                print(f'product releaseDate format updated : {kick.name}')
+                if not products_list[p]['data'].get('release_date'):
+                    print(f'No release date found for {products_list[p].get("name")}')
+                else:
+                    date_format = '%Y%m%d'
+                    release_Date = str(products_list[p]['data'].get('release_date'))
+                    #if releaseDate is not null format the date to YYYY-MM-DD
+                    release_Date = datetime.datetime.strptime(release_Date, date_format)
+                    release_Date = str(release_Date.date())
+                        
+                    kick.releaseDate = release_Date
                     result =1
             
-            if kick.releaseDate == '1900-00-00':
-                print(f'product releaseDate updated : {kick.name}')
+            elif kick.releaseDate == '1900-00-00':
                 if not products_list[p]['data'].get('release_date'):
                     print(f'No release date found for {products_list[p].get("name")}')
                 else:
-                    kick.releaseDate = products_list[p]['data'].get('release_date') 
+                    date_format = '%Y%m%d'
+                    release_Date = products_list[p]['data'].get('release_date'),
+                    #if releaseDate is not null format the date to YYYY-MM-DD
+                    release_Date = datetime.datetime.strptime(release_Date, date_format)
+                    release_Date = str(release_Date.date())
+                        
+                    kick.releaseDate = release_Date
                     result =1
                 
             
@@ -355,6 +380,12 @@ def create_new_kick_data(products_list, p, brand):
         print(f'################New product######################')
         sku = products_list[p]['data'].get('sku')
         new_sku = str(sku).replace(' ', '-')
+        date_format = '%Y%m%d'
+        release_Date = products_list[p]['data'].get('release_date'),
+        #if releaseDate is not null format the date to YYYY-MM-DD
+        if release_Date:
+            release_Date = datetime.datetime.strptime(release_Date, date_format)
+            release_Date = str(release_Date.date())
         kick = kicks(
                     uuid                 = products_list[p]['data'].get('id'),
                     name                 = products_list[p].get('value'),
@@ -362,7 +393,7 @@ def create_new_kick_data(products_list, p, brand):
                     category             = products_list[p]['data'].get('category'),
                     product_type         = products_list[p]['data'].get('product_type'),
                     colorway             = products_list[p]['data'].get('color'),                  
-                    releaseDate          = products_list[p]['data'].get('release_date'),
+                    releaseDate          = release_Date,
                     release_date_year    = products_list[p]['data'].get('release_date_year'),
                     retailPrice          = products_list[p]['data'].get('retail_price_cents'),
                     retailPriceKrw       = products_list[p]['data'].get('retail_price_cents_krw'),
