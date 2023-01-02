@@ -27,7 +27,7 @@ class kicksSerializer(serializers.ModelSerializer):
     avg_rating = serializers.SerializerMethodField()
     class Meta:
         model = kicks
-        fields = ('reviews', 'count_reviews','avg_rating', 'id', 'brand', 'colorway', 'description', 
+        fields = ('reviews', 'count_reviews','avg_rating', 'id', 'brand', 'colorway', 'description', 'category', 
                 'gender', 'name', 'releaseDate', 'retailPrice', 'estimatedMarketValue', 
                 'sku', 'imageUrl','local_imageUrl', 'like_users',)
     
