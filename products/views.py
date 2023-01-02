@@ -305,6 +305,9 @@ def create_new_kick_data(products_list, p, brand):
                 else:
                     date_format = '%Y%m%d'
                     release_Date = products_list[p]['data'].get('release_date'),
+                    release_Date = str(release_Date).strip('()').strip(',')
+                    print(f'release_Date: {release_Date}')
+                    print(f'type(release_Date): {type(release_Date)}')
                     #if releaseDate is not null format the date to YYYY-MM-DD
                     release_Date = datetime.datetime.strptime(release_Date, date_format)
                     release_Date = str(release_Date.date())
@@ -318,9 +321,10 @@ def create_new_kick_data(products_list, p, brand):
                     print(f'No release date found for {products_list[p].get("name")}')
                 else:
                     date_format = '%Y%m%d'
-                    release_Date = str(products_list[p]['data'].get('release_date'))
+                    release_Date = products_list[p]['data'].get('release_date')
+                    release_Date = str(release_Date).strip('()').strip(',')
                     #if releaseDate is not null format the date to YYYY-MM-DD
-                    release_Date = datetime.datetime.strptime(release_Date, date_format)
+                    release_Date = datetime.datetime.strptime(str(release_Date), date_format)
                     release_Date = str(release_Date.date())
                         
                     kick.releaseDate = release_Date
@@ -333,7 +337,8 @@ def create_new_kick_data(products_list, p, brand):
                     date_format = '%Y%m%d'
                     release_Date = products_list[p]['data'].get('release_date'),
                     #if releaseDate is not null format the date to YYYY-MM-DD
-                    release_Date = datetime.datetime.strptime(release_Date, date_format)
+                    release_Date = str(release_Date).strip('()').strip(',')
+                    release_Date = datetime.datetime.strptime(str(release_Date), date_format)
                     release_Date = str(release_Date.date())
                         
                     kick.releaseDate = release_Date
@@ -381,10 +386,11 @@ def create_new_kick_data(products_list, p, brand):
         sku = products_list[p]['data'].get('sku')
         new_sku = str(sku).replace(' ', '-')
         date_format = '%Y%m%d'
-        release_Date = products_list[p]['data'].get('release_date'),
+        release_Date = products_list[p]['data'].get('release_date')
         #if releaseDate is not null format the date to YYYY-MM-DD
         if release_Date:
-            release_Date = datetime.datetime.strptime(release_Date, date_format)
+            release_Date = str(release_Date).strip('()').strip(',')
+            release_Date = datetime.datetime.strptime(str(release_Date), date_format)
             release_Date = str(release_Date.date())
         kick = kicks(
                     uuid                 = products_list[p]['data'].get('id'),
