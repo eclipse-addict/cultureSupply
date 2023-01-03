@@ -13,7 +13,7 @@ from rest_framework import status
 from rest_framework import generics
 from rest_framework import filters
 from .serializers import kicksSerializer
-from .models import kicks
+from .models import kicks, productImg
 from datetime import date, timedelta
 import pprint
 import requests
@@ -630,4 +630,33 @@ def duplicate_check(request):
             # else:
             #     print(f'sku check 없음 : {sku}')
             
+    return HttpResponse(status.HTTP_200_OK)
+
+
+'''
+기존 이미지 -> 이미지 테이블에 저장. 
+'''
+def select_all_and_add_img_model(request):
+    img_type_list = ['back', 'top', 'bottom', 'additional']
+    all_products = kicks.objects.all().order_by('-releaseDate')
+    
+    for p in all_products:
+        # print(f'p : {p.id}, {p.name}')
+        print(p)
+        if p.local_imageUrl != 'http://localhost:8000/media/images/defaultImg.png':
+            img = productImg(
+                product = p,
+                img_url = p.local_imageUrl,
+                type = 'left'
+            )
+            img.save()
+            
+            for type in img_type_list:
+                img = productImg(
+                    product = p,
+                    img_url = 'http://localhost:8000/media/images/defaultImg.png',
+                    type = type
+                )
+                img.save()
+                
     return HttpResponse(status.HTTP_200_OK)

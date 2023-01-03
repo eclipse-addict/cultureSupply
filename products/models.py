@@ -38,4 +38,4 @@ class kicks(models.Model):
 class productImg(models.Model):
     product = models.ForeignKey(kicks, on_delete=models.CASCADE, related_name='productImg')
     img_url = models.CharField(max_length=500, null=False, blank=False,)
-    type    = models.CharField(max_length=100, null=False, blank=False,) # main, left, right, back, top, front
+    type    = models.CharField(max_length=100, null=False, blank=False,) # left(main), right(main_sub), back, top, bottom, additional
