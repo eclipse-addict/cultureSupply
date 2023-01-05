@@ -1,4 +1,4 @@
-from .models import kicks
+from .models import kicks, productImg
 from rest_framework import serializers
 from reviews.models import Review
 from accounts.models import UserInfo
@@ -10,7 +10,6 @@ class UserInfoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ReviewListSerializer(serializers.ModelSerializer):
-
     class Meta: 
         model = Review
         fields = ('content', 'rating', 'created_at', 'like_users', 'dislike_users')
@@ -20,14 +19,21 @@ class ReviewListSerializer(serializers.ModelSerializer):
         response['user_info'] = UserInfoSerializer(instance.user_info).data
         return response
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = productImg
+        fields = '__all__'
+
+
+
 class kicksSerializer(serializers.ModelSerializer):    
-    # id = serializers.ReadOnlyField()
-    reviews = ReviewListSerializer(many=True, read_only=True)
+    reviews       = ReviewListSerializer(many=True, read_only=True)
+    productImg    = ProductImageSerializer(many=True, read_only=True)
     count_reviews = serializers.SerializerMethodField()
-    avg_rating = serializers.SerializerMethodField()
+    avg_rating    = serializers.SerializerMethodField()
     class Meta:
         model = kicks
-        fields = ('reviews', 'count_reviews','avg_rating', 'id', 'brand', 'colorway', 'description', 'category', 
+        fields = ('reviews', 'productImg', 'count_reviews','avg_rating', 'id', 'brand', 'colorway', 'description', 'category', 
                 'gender', 'name', 'releaseDate', 'retailPrice', 'estimatedMarketValue', 
                 'sku', 'imageUrl','local_imageUrl', 'like_users',)
     
