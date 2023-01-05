@@ -39,3 +39,5 @@ class productImg(models.Model):
     product = models.ForeignKey(kicks, on_delete=models.CASCADE, related_name='productImg')
     img_url = models.CharField(max_length=500, null=False, blank=False,)
     type    = models.CharField(max_length=100, null=False, blank=False,) # left(main), right(main_sub), back, top, bottom, additional
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

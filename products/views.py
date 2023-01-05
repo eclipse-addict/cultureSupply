@@ -306,8 +306,7 @@ def create_new_kick_data(products_list, p, brand):
                     date_format = '%Y%m%d'
                     release_Date = products_list[p]['data'].get('release_date'),
                     release_Date = str(release_Date).strip('()').strip(',')
-                    print(f'release_Date: {release_Date}')
-                    print(f'type(release_Date): {type(release_Date)}')
+
                     #if releaseDate is not null format the date to YYYY-MM-DD
                     release_Date = datetime.datetime.strptime(release_Date, date_format)
                     release_Date = str(release_Date.date())
@@ -410,7 +409,34 @@ def create_new_kick_data(products_list, p, brand):
             )
         kick.save()
         
+        save_product_img(products_list, p, kick)
+        
         return 1 
+
+def save_product_img(products_list, p, kick):
+    img_type_list = ['left', 'back', 'top', 'bottom', 'additional']
+    img_url = products_list[p]['data'].get('image_url')
+    if img_url:
+        img = productImg(
+                    product = kick,
+                    img_url = img_url,
+                    type = 'right'
+                )
+    else:
+        img = productImg(
+                    product = kick,
+                    img_url = 'http://localhost:8000/media/images/defaultImg.png',
+                    type = 'right'
+                )
+    img.save()
+        
+    for type in img_type_list:
+        img = productImg(
+                product = kick,
+                img_url = 'http://localhost:8000/media/images/defaultImg.png',
+                type = type
+            )
+        img.save()
 
 
 
@@ -637,19 +663,25 @@ def duplicate_check(request):
 기존 이미지 -> 이미지 테이블에 저장. 
 '''
 def select_all_and_add_img_model(request):
-    img_type_list = ['back', 'top', 'bottom', 'additional']
-    all_products = kicks.objects.all().order_by('-releaseDate')
-    
+    img_type_list = ['left', 'back', 'top', 'bottom', 'additional']
+    all_products = kicks.objects.filter(local_imageUrl='http://localhost:8000/media/images/defaultImg.png').order_by('-releaseDate')
+    #right img 추가로 등록 해야함. 
     for p in all_products:
         # print(f'p : {p.id}, {p.name}')
         print(p)
-        if p.local_imageUrl != 'http://localhost:8000/media/images/defaultImg.png':
-            img = productImg(
-                product = p,
-                img_url = p.local_imageUrl,
-                type = 'left'
-            )
-            img.save()
+        # img = productImg(
+        #             product = p,
+        #             img_url = 'http://localhost:8000/media/images/defaultImg.png',
+        #             type = 'right'
+        #         )
+        # img.save()
+        if p.local_imageUrl == 'http://localhost:8000/media/images/defaultImg.png':
+            # img = productImg(
+            #     product = p,
+            #     img_url = p.local_imageUrl,
+            #     type = 'right'
+            # )
+            # img.save()
             
             for type in img_type_list:
                 img = productImg(
