@@ -587,11 +587,19 @@ def sneaker_img_paser(request):
                 img_url = 'http://localhost:8000/media/images/sneakers/'+file_name[:file_name.find('?')]
                 p.local_imageUrl = img_url
                 p.save()
+                
+                img = productImg.objects.filter(product=p).filter(type='right')
+                img.img_url = img_url
+                img.save()
                 count +=1
             except:
                 print(f'Error occured')
                 p.imageUrl = 'http://localhost:8000/media/images/defaultImg.png'
                 p.save()
+                
+                img = productImg.objects.filter(product=p).filter(type='right')
+                img.img_url = 'http://localhost:8000/media/images/defaultImg.png'
+                img.save()
                 
     print(f'{time.time() - start}')
     return HttpResponse(status= status.HTTP_200_OK)
@@ -691,4 +699,17 @@ def select_all_and_add_img_model(request):
                 )
                 img.save()
                 
+    return HttpResponse(status.HTTP_200_OK)
+
+
+def temp_img_fix(request):
+    right_img_list = productImg.objects.filter(type='right').filter(Q(img_url__icontains='https://image.goat.com/'))
+    
+    for img in right_img_list:
+        product = kicks.objects.get(id=img.product.id)
+        if product.local_imageUrl != 'http://localhost:8000/media/images/defaultImg.png':
+            img.img_url = product.local_imageUrl
+            img.save()
+            print(f'img save : {img.img_url}')
+        
     return HttpResponse(status.HTTP_200_OK)

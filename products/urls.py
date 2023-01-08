@@ -17,7 +17,7 @@ urlpatterns = [
     path('goat/', views.get_goat),
     path('goat/collections/', views.goat_collections),
     path('dup/', views.duplicate_check),
-    path('imgmodel/', views.select_all_and_add_img_model),
+    path('imgmodel/', views.temp_img_fix),
     
     
 
