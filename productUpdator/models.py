@@ -1,5 +1,5 @@
 from django.db import models
-from ..products.models import kicks as product
+from products.models import kicks as product
 from django.conf import settings
 
 
@@ -9,7 +9,7 @@ from django.conf import settings
 class ProductUpdator(models.Model):
     """_summary_
         ProductUpdator model 은 유저가 각 제품에 대한 추가 정보를 담고 있습니다.
-        일종의 게시판과 같이 작동한다.
+        일종의 게시판과 같이 작동한다
     Args:
         models (_type_): _description_
     """

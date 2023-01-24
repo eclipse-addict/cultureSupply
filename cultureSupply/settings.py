@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'products',
     'reviews',
     'points',
+    'productUpdator',
     
     'bootstrap5',
     'imagekit',
