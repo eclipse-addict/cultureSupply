@@ -28,6 +28,7 @@ class ProductUpdatorItems(models.Model):
     product_updator_id = models.ForeignKey(ProductUpdator, on_delete=models.CASCADE, related_name='productUpdatorItems')
     field_name  = models.CharField(max_length=100, null=False, blank=False,)
     field_value = models.CharField(max_length=2500, null=False, blank=False,)
+    image       = models.ImageField(upload_to='productUpdator/', null=True, blank=True)
     aproved     = models.BooleanField(default=False) # 제품 정보 업데이트 요청이 승인되었는지 여부
     created_at  = models.DateTimeField(auto_now_add=True)
     updated_at  = models.DateTimeField(auto_now=True)

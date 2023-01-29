@@ -32,6 +32,7 @@ if settings.DEBUG:
         path('kicks/', include('products.urls')),
         path('user/', include('accounts.urls')),
         path('review/', include('reviews.urls')),
+        path('info/', include('productUpdator.urls')),
         
         path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
         path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
