@@ -66,10 +66,11 @@ class ProductListViewSet(generics.ListAPIView):
         if search:
             q = Q()
             keyword = search.replace('+', ' ')
-            q.add(Q(name__icontains=keyword), q.OR)
-            q.add(Q(name__icontains=keyword.replace(' ','')), q.OR)
-            for word in search.split():
-                q.add(Q(name__icontains=word), q.OR)
+            q.add(Q(name__icontains=keyword), q.OR) # 검색어 조건 공백 포함 검색
+            q.add(Q(name__icontains=keyword.replace(' ','')), q.OR) # 검색어 조건 공백 제거 후 붙여서 검색
+            # //TODO: 주석 처리 23.02.14 -> 검색 결과의 정확도가 떨어짐. ex) jordan 5 로 검색 시, jordan, 5 로 각각 검색한 결과까지 함께 결과에 포함됨. 
+            # for word in search.split():
+            #     q.add(Q(name__icontains=word), q.OR)
                 
             queryset = queryset.filter(q)
             
