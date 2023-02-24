@@ -23,20 +23,19 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-if settings.DEBUG:
-    import debug_toolbar
+#if settings.DEBUG:
+ #   import debug_toolbar
+urlpatterns = [
+    path('admin/', admin.site.urls),
 
-    urlpatterns = [
-        path('admin/', admin.site.urls),
-
-        path('kicks/', include('products.urls')),
-        path('user/', include('accounts.urls')),
-        path('review/', include('reviews.urls')),
-        path('info/', include('productUpdator.urls')),
+    path('kicks/', include('products.urls')),
+    path('user/', include('accounts.urls')),
+    path('review/', include('reviews.urls')),
+    path('info/', include('productUpdator.urls')),
         
-        path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-        path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-        path('__debug__/', include(debug_toolbar.urls)),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+#    path('__debug__/', include(debug_toolbar.urls)),
 
-    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

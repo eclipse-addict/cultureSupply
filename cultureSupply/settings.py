@@ -13,7 +13,10 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 import os, json   
+import pymysql
 
+
+pymysql.install_as_MySQLdb()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -48,9 +51,9 @@ NEW_RELEASE_URL = get_secret("new_release_url")
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -138,12 +141,12 @@ WSGI_APPLICATION = 'cultureSupply.wsgi.application'
 
 DATABASES = {
     'default' : {
-        'ENGINE': 'django.db.backends.mysql',    
-        'HOST': '127.0.0.1',                 
-        'NAME': 'cultureDB',                  
-        'USER': 'root',                         
-        'PASSWORD': 'root',                  
-        'PORT': '3306',                    
+       'ENGINE': 'django.db.backends.postgresql',
+       'NAME': 'test_db' ,
+       'USER': 'isaac' ,
+       'PASSWORD': 'ghwn0524@',
+       'HOST': 'localhost',
+       'PORT': '5432',
     }
 }
 
