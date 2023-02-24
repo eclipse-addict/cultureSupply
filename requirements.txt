@@ -53,8 +53,6 @@ jedi==0.18.1
 josepy==1.13.0
 matplotlib-inline==0.1.6
 multidict==6.0.2
-mysql-connector==2.2.9
-mysql-connector-python==8.0.32
 oauthlib==3.2.1
 outcome==1.2.0
 parsedatetime==2.6
