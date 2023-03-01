@@ -19,6 +19,10 @@ urlpatterns = [
     path('dup/', views.duplicate_check),
     path('imgmodel/', views.temp_img_fix),
     
+    path('imgupdator/', views.img_url_updator),
+    
+    
+    
     
 
 ] 

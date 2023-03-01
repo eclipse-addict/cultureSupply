@@ -714,3 +714,16 @@ def temp_img_fix(request):
             print(f'img save : {img.img_url}')
         
     return HttpResponse(status.HTTP_200_OK)
+
+
+
+def img_url_updator(reqeust):
+    products = kicks.objects.exclude(local_imageUrl='http://localhost:8000/media/images/defaultImg.png')
+    for p in products:
+        p.local_imageUrl = p.local_imageUrl.replace('http://localhost:8000', 'https://www.kickin.co.kr')
+        p.save()
+        
+    res = HttpResponse('success' + str(len(products)))
+    res.status_code = 200
+    
+    return res
