@@ -369,11 +369,7 @@ def create_new_kick_data(products_list, p, brand):
                     kick.imageUrl = products_list[p]['data'].get('image_url')
                     result = 1
                                                 
-            # if not kick.brand:
-            #     if products_list[p]['data'].get('brand'):
-            #         print(f'product brand updated : {kick.name}')
-            #         kick.imageUrl = products_list[p]['data'].get('brand')
-            #         result = 1                            
+                        
 
             if result >0:
                 kick.save()
@@ -410,7 +406,9 @@ def create_new_kick_data(products_list, p, brand):
             )
         kick.save()
         
-        save_product_img(products_list, p, kick)
+        
+        # save_product_img(products_list, p, kick)
+        
         
         return 1 
 
@@ -494,71 +492,37 @@ def sneaker_data_by_brand_paser(request):
     return HttpResponse(status= status.HTTP_201_CREATED)
 
 
-#update Count : 4849
+
 def sneaker_img_paser(request):
     start = time.time()
     count = 0
     # 이미 추가한 것 필터로 빼고 갖고오기..
-    all_products = kicks.objects.filter(local_imageUrl='http://localhost:8000/media/images/defaultImg.png').exclude(imageUrl__isnull=True).order_by('-releaseDate')
+    all_products = kicks.objects.filter(local_imageUrl='media/images/defaultImg.png').exclude(imageUrl__isnull=True).order_by('-releaseDate')
     
-    for i, p in enumerate(all_products):
-        
+    for i, p in enumerate(all_products):        
         if p.imageUrl!='' and p.imageUrl.find('stockx')== -1:
             print(f'Name check (goat):{p.id} {p.name}')
             print(f'URL Check:{p.imageUrl}')
             imageUrl = p.imageUrl
-            # path = os.path.dirname(imageUrl)[22:]
             # 저장 경로 
             file_name = os.path.basename(imageUrl)
             path = urlparse(imageUrl).path
             path_url = path[:path.find(file_name)]
-            
-            
+                        
             # 디렉토리가 없으면 생성
             # check_dir(local_path)
             # 설정한 경로에 파일 저장
             try:                
                 req.urlretrieve(imageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
                 # 해당 제품 db 업데이트
-                img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
+                img_url = 'https://www.kickin.co.kr/media/images/sneakers/'+file_name
                 p.local_imageUrl = img_url
-                ################################################################################################
-                # smallImageUrl = p.smallImageUrl
-                # # 저장 할 제품 이름
-                # file_name = os.path.basename(smallImageUrl)
-                # path = urlparse(smallImageUrl).path
-                # path_url = path[:path.find(file_name)]
-                # 저장 경로 
-                local_path = '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers'+path_url
-                # 디렉토리가 없으면 생성
-                # check_dir(local_path)
-                # 설정한 경로에 파일 저장 
-                # req.urlretrieve(smallImageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
-                # # 해당 제품 db 업데이트
-                # small_img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
-                # p.local_smallImageUrl = small_img_url
-                ################################################################################################
-                # thumbUrl = p.thumbUrl
-                # # 저장 할 제품 이름
-                # file_name = os.path.basename(thumbUrl)
-                # path = urlparse(thumbUrl).path
-                # path_url = path[:path.find(file_name)]
-                # 저장 경로 
-                # local_path = '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers'+path
-                # # 디렉토리가 없으면 생성
-                # # check_dir(local_path)
-                # # 설정한 경로에 파일 저장 
-                # req.urlretrieve(thumbUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
-                # # 해당 제품 db 업데이트
-                # thumb_Url_img_url = 'http://localhost:8000/media/images/sneakers/'+file_name
-
-                # p.local_thumbUrl = thumb_Url_img_url
-                # 최종 저장 
-                p.save()
+                p.save()                
                 count +=1
+                
             except:
                 print(f'Error occured')
-                p.imageUrl = 'http://localhost:8000/media/images/defaultImg.png'
+                p.imageUrl = 'media/images/defaultImg.png'
                 p.save()
                 
         # Stockx url 일 경우, 
@@ -672,30 +636,23 @@ def duplicate_check(request):
 기존 이미지 -> 이미지 테이블에 저장. 
 '''
 def select_all_and_add_img_model(request):
-    img_type_list = ['left', 'back', 'top', 'bottom', 'additional']
-    all_products = kicks.objects.filter(local_imageUrl='http://localhost:8000/media/images/defaultImg.png').order_by('-releaseDate')
-    #right img 추가로 등록 해야함. 
+    img_type_list = ['right', 'left', 'back', 'top', 'bottom', 'additional']  # 이미지 타입 리스트 
+    all_products = kicks.objects.all() 
     for p in all_products:
-        # print(f'p : {p.id}, {p.name}')
-        print(p)
-        # img = productImg(
-        #             product = p,
-        #             img_url = 'http://localhost:8000/media/images/defaultImg.png',
-        #             type = 'right'
-        #         )
-        # img.save()
-        if p.local_imageUrl == 'http://localhost:8000/media/images/defaultImg.png':
-            # img = productImg(
-            #     product = p,
-            #     img_url = p.local_imageUrl,
-            #     type = 'right'
-            # )
-            # img.save()
-            
+        print(f'p : {p.id}, {p.name}')
+
+        if p.local_imageUrl != 'media/images/defaultImg.png': # 기존 이미지가 존재 하는 경우
+            img = productImg(
+                product = p,
+                img_url = p.local_imageUrl,
+                type = 'right' # right 이미지만 기본 이미지로 저장
+            )
+            img.save()
+        else: # 기본 이미지 없는 경우
             for type in img_type_list:
                 img = productImg(
                     product = p,
-                    img_url = 'http://localhost:8000/media/images/defaultImg.png',
+                    img_url = 'media/images/defaultImg.png',
                     type = type
                 )
                 img.save()
@@ -719,12 +676,12 @@ def temp_img_fix(request):
 
 def img_url_updator(reqeust):
     print('img_url_updator')
-    products = kicks.objects.exclude(local_imageUrl='http://localhost:8000/media/images/defaultImg.png')
+    products = kicks.objects.all()
     print('products size : ', len(products))
     
     for p in products:
         print(f'p : {p.local_imageUrl}')
-        p.local_imageUrl = p.local_imageUrl.replace('http://localhost:8000', 'https://www.kickin.co.kr')
+        p.local_imageUrl = p.local_imageUrl.replace('http://localhost:8000/', '')
         print(f'p : {p.local_imageUrl}')
         p.save()
         
