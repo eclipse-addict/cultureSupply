@@ -13,13 +13,15 @@ urlpatterns = [
     path('brand/', views.sneaker_data_by_brand_paser),
     path('test/', views.google_img_download),
     path('popular/', views.popular_release),
-    path('img/pasing/', views.sneaker_img_paser),
+    path('img/pasing/', views.sneaker_img_paser), # 이미지 다운로더 
     path('goat/', views.get_goat),
     path('goat/collections/', views.goat_collections),
     path('dup/', views.duplicate_check),
     path('imgmodel/', views.temp_img_fix),
     
-    path('imgupdator/', views.img_url_updator),
+    path('imgmodeladd/', views.select_all_and_add_img_model),
+    
+    # path('imgupdator/', views.img_url_updator), # 이미지 Url Localhost -> https://www.kickin.co.kr/ 로 변경
     
     
     

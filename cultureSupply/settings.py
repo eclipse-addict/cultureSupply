@@ -51,7 +51,7 @@ NEW_RELEASE_URL = get_secret("new_release_url")
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -142,9 +142,9 @@ WSGI_APPLICATION = 'cultureSupply.wsgi.application'
 DATABASES = {
     'default' : {
        'ENGINE': 'django.db.backends.postgresql',
-       'NAME': 'test_db' ,
-       'USER': 'isaac' ,
-       'PASSWORD': 'ghwn0524@',
+       'NAME': 'kickin_db' ,
+       'USER': 'postgres' ,
+       'PASSWORD': '1234',
        'HOST': 'localhost',
        'PORT': '5432',
     }
