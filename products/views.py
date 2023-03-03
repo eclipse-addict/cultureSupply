@@ -637,7 +637,9 @@ def duplicate_check(request):
 '''
 def select_all_and_add_img_model(request):
     img_type_list = ['right', 'left', 'back', 'top', 'bottom', 'additional']  # 이미지 타입 리스트 
-    all_products = kicks.objects.all() 
+    # all_products = kicks.objects.all()
+    # 나누자.. 디폴트 이미지와 아닌것 두번으로 QuerySet 나누기
+    all_products = kicks.objects.filter(Q(local_imageUrl__icontains='media/images/defaultImg.png'))
     for p in all_products:
         print(f'p : {p.id}, {p.name}')
 
