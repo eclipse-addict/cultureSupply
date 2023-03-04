@@ -517,7 +517,7 @@ def sneaker_img_paser(request):
                 # /Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/ -> local_path
                 req.urlretrieve(imageUrl, '/var/services/web/kickin/media/images/sneakers/'+file_name)
                 # 해당 제품 db 업데이트
-                img_url = 'https://www.kickin.co.kr/media/images/sneakers/'+file_name
+                img_url = 'media/images/sneakers/'+file_name
                 p.local_imageUrl = img_url
                 p.save()                
                 count +=1
@@ -551,7 +551,7 @@ def sneaker_img_paser(request):
             try:                
                 req.urlretrieve(imageUrl, '/var/services/web/kickin/media/images/sneakers/'+file_name[:file_name.find('?')])
                 # 해당 제품 db 업데이트
-                img_url = 'https://www.kickin.co.kr/media/images/sneakers/'+file_name[:file_name.find('?')]
+                img_url = 'media/images/sneakers/'+file_name[:file_name.find('?')]
                 p.local_imageUrl = img_url
                 p.save()
                 
