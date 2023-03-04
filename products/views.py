@@ -513,7 +513,9 @@ def sneaker_img_paser(request):
             # check_dir(local_path)
             # 설정한 경로에 파일 저장
             try:                
-                req.urlretrieve(imageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name)
+                # /var/services/web/kickin/media/images/sneakers/ -> server_path
+                # /Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/ -> local_path
+                req.urlretrieve(imageUrl, '/var/services/web/kickin/media/images/sneakers/'+file_name)
                 # 해당 제품 db 업데이트
                 img_url = 'https://www.kickin.co.kr/media/images/sneakers/'+file_name
                 p.local_imageUrl = img_url
@@ -547,9 +549,9 @@ def sneaker_img_paser(request):
             # check_dir(local_path)
             # 설정한 경로에 파일 저장 
             try:                
-                req.urlretrieve(imageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name[:file_name.find('?')])
+                req.urlretrieve(imageUrl, '/var/services/web/kickin/media/images/sneakers/'+file_name[:file_name.find('?')])
                 # 해당 제품 db 업데이트
-                img_url = 'http://localhost:8000/media/images/sneakers/'+file_name[:file_name.find('?')]
+                img_url = 'https://www.kickin.co.kr/media/images/sneakers/'+file_name[:file_name.find('?')]
                 p.local_imageUrl = img_url
                 p.save()
                 
@@ -559,11 +561,11 @@ def sneaker_img_paser(request):
                 count +=1
             except:
                 print(f'Error occured')
-                p.imageUrl = 'http://localhost:8000/media/images/defaultImg.png'
+                p.imageUrl = 'media/images/defaultImg.png'
                 p.save()
                 
                 img = productImg.objects.filter(product=p).filter(type='right')
-                img.img_url = 'http://localhost:8000/media/images/defaultImg.png'
+                img.img_url = 'media/images/defaultImg.png'
                 img.save()
                 
     print(f'{time.time() - start}')
