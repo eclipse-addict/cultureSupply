@@ -26,21 +26,29 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 
-class kicksSerializer(serializers.ModelSerializer):    
-    reviews       = ReviewListSerializer(many=True, read_only=True)
-    productImg    = ProductImageSerializer(many=True, read_only=True)
-    count_reviews = serializers.SerializerMethodField()
-    avg_rating    = serializers.SerializerMethodField()
+class kicksSerializer(serializers.ModelSerializer):   
     class Meta:
         model = kicks
-        fields = ('reviews', 'productImg', 'count_reviews','avg_rating', 'id', 'brand', 'colorway', 'description', 'category', 
+        fields = ('id', 'brand', 'colorway', 'description', 'category', 
                 'gender', 'name', 'releaseDate', 'retailPrice', 'estimatedMarketValue', 
                 'sku', 'imageUrl','local_imageUrl', 'like_users',)
     
-    def get_count_reviews(self, obj):
-        return obj.reviews.count()
 
-    def get_avg_rating(self, ob):
-        # reverse lookup on Reviews using item field
-        return ob.reviews.all().aggregate(Avg('rating'))['rating__avg']
+# class kicksSerializer(serializers.ModelSerializer):    
+#     reviews       = ReviewListSerializer(many=True, read_only=True)
+#     productImg    = ProductImageSerializer(many=True, read_only=True)
+#     count_reviews = serializers.SerializerMethodField()
+#     avg_rating    = serializers.SerializerMethodField()
+#     class Meta:
+#         model = kicks
+#         fields = ('reviews', 'productImg', 'count_reviews','avg_rating', 'id', 'brand', 'colorway', 'description', 'category', 
+#                 'gender', 'name', 'releaseDate', 'retailPrice', 'estimatedMarketValue', 
+#                 'sku', 'imageUrl','local_imageUrl', 'like_users',)
+    
+#     def get_count_reviews(self, obj):
+#         return obj.reviews.count()
+
+#     def get_avg_rating(self, ob):
+#         # reverse lookup on Reviews using item field
+#         return ob.reviews.all().aggregate(Avg('rating'))['rating__avg']
 
