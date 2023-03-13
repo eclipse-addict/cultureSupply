@@ -687,6 +687,7 @@ def select_all_and_add_img_model(request):
     chunk_size = 1000  
     # all_products = kicks.objects.filter(Q(local_imageUrl__icontains='media/images/defaultImg.png'))
     for i in range(0, product_count, chunk_size):
+        print(f'count : {i} ~ {i+chunk_size}')
         all_products = kicks.objects.all()[i:i+chunk_size]
         
         for p in all_products:
@@ -708,8 +709,6 @@ def select_all_and_add_img_model(request):
                         type = type
                     )
                     img.save()
-                
-                
                 
             else: # 기본 이미지 없는 경우 타입 리스트 순회하며, 기본 이미지 저장
                 for type in img_type_list:
