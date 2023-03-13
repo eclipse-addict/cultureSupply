@@ -683,25 +683,42 @@ def select_all_and_add_img_model(request):
     img_type_list = ['right', 'left', 'back', 'top', 'bottom', 'additional']  # 이미지 타입 리스트 
     # all_products = kicks.objects.all()
     # 나누자.. 디폴트 이미지와 아닌것 두번으로 QuerySet 나누기
-    all_products = kicks.objects.filter(Q(local_imageUrl__icontains='media/images/defaultImg.png'))
-    for p in all_products:
-        print(f'p : {p.id}, {p.name}')
-
-        if p.local_imageUrl != 'media/images/defaultImg.png': # 기존 이미지가 존재 하는 경우
-            img = productImg(
-                product = p,
-                img_url = p.local_imageUrl,
-                type = 'right' # right 이미지만 기본 이미지로 저장
-            )
-            img.save()
-        else: # 기본 이미지 없는 경우
-            for type in img_type_list:
+    product_count = kicks.objects.all().count()
+    chunk_size = 1000  
+    # all_products = kicks.objects.filter(Q(local_imageUrl__icontains='media/images/defaultImg.png'))
+    for i in range(0, product_count, chunk_size):
+        all_products = kicks.objects.all()[i:i+chunk_size]
+        
+        for p in all_products:
+            if p.local_imageUrl != 'media/images/defaultImg.png': # 기존 이미지가 존재 하는 경우
                 img = productImg(
                     product = p,
-                    img_url = 'media/images/defaultImg.png',
-                    type = type
+                    img_url = p.local_imageUrl,
+                    type = 'right' # right 이미지만 제품 이미지로 저장
                 )
                 img.save()
+                
+                for type in img_type_list:
+                    if type == 'right': # right 이미지는 이미 저장했으므로
+                        continue
+                    
+                    img = productImg( # left, back, top, bottom, additional 이미지 저장
+                        product = p,
+                        img_url = 'media/images/defaultImg.png',
+                        type = type
+                    )
+                    img.save()
+                
+                
+                
+            else: # 기본 이미지 없는 경우 타입 리스트 순회하며, 기본 이미지 저장
+                for type in img_type_list:
+                    img = productImg(
+                        product = p,
+                        img_url = 'media/images/defaultImg.png',
+                        type = type
+                    )
+                    img.save()
                 
     return HttpResponse(status.HTTP_200_OK)
 
