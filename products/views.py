@@ -12,7 +12,7 @@ from rest_framework.pagination import PageNumberPagination, CursorPagination
 from rest_framework import status
 from rest_framework import generics
 from rest_framework import filters
-from .serializers import kicksSerializer
+from .serializers import productListSerializer, productSerializer
 from .models import kicks, productImg
 from datetime import date, timedelta
 import pprint
@@ -72,7 +72,7 @@ class ProductFilter(filters.FilterSet):
 class ProductListViewSet(generics.ListAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = kicks.objects.all()
-    serializer_class = kicksSerializer
+    serializer_class = productListSerializer
     pagination_class = ProductPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
@@ -83,7 +83,7 @@ class ProductListViewSet(generics.ListAPIView):
 # class ProductListViewSet(generics.ListAPIView):
 #     permission_classes = (IsAuthenticatedOrReadOnly,)
 #     queryset = kicks.objects.all()
-#     serializer_class = kicksSerializer
+#     serializer_class = productListSerializer
 #     pagination_class = ProductPagination
 #     # filter_backends = [filters.SearchFilter]
 #     filter_backends = [DjangoFilterBackend]
@@ -133,7 +133,7 @@ def popular_release(request):
     if request.method == 'GET':
         product_list = kicks.objects.exclude(local_imageUrl='http://localhost:8000/media/images/defaultImg.png').order_by('-releaseDate')[0:12]
         
-        serializer = kicksSerializer(product_list, many=True)
+        serializer = productSerializer(product_list, many=True)
         return JsonResponse(serializer.data, safe=False)
     else:
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
@@ -152,7 +152,7 @@ def main_img(request):
                 main_img = p
                 result.append(main_img)
         print(f'main_img : {result}')
-        serializer = kicksSerializer(result[:2], many=True)
+        serializer = productListSerializer(result[:2], many=True)
         return JsonResponse(serializer.data, safe=False)
     else:
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
@@ -164,10 +164,11 @@ def main_img(request):
 def get_detail(request, id):
     kick = get_object_or_404(kicks, id=id)
     
-    serializer = kicksSerializer(kick)
+    serializer = productSerializer(kick)
     print(f'res : {kick}')
     
-    return JsonResponse(serializer.data, safe=False)
+    return JsonResponse(serializer.data, safe=True)
+
 
 
 @api_view(['POST'])
