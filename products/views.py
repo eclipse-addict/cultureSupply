@@ -50,22 +50,28 @@ class ProductFilter(filters.FilterSet):
         fields = ('search', 'brand', 'release_date')
         
     def search_filter(self, queryset, name, value):
+        print('search_filter')
         keyword = value.replace('+', ' ')
+        
         
         return queryset.filter(
             Q(name__icontains=keyword) | Q(name__icontains=keyword.replace(' ', '')))
         
     def release_date_filter(self, queryset, name, value):
-            if not value:
-                # releaseDate가 null인 경우
-                start_date = date.today() - timedelta(days=15)
-                end_date = date.today() + timedelta(days=15)
-            else:
-                # releaseDate가 null이 아닌 경우
-                date_range = value.split(',')
-                start_date = date_range[0]
-                end_date = date_range[1]
-            return queryset.filter(releaseDate__range=[start_date, end_date])
+        print('release_date_filter')
+        if not value:
+            print('releaseDate is null')
+            return queryset.all().order_by('-releaseDate')
+            # releaseDate가 null인 경우
+            # start_date = date.today() - timedelta(days=15)
+            # end_date = date.today() + timedelta(days=15)
+        else:
+            # releaseDate가 null이 아닌 경우
+            date_range = value.split(',')
+            start_date = date_range[0]
+            end_date = date_range[1]
+            print(start_date, end_date)
+        return queryset.filter(releaseDate__range=[start_date, end_date])
 
         
 
@@ -739,13 +745,13 @@ def temp_img_fix(request):
 
 def img_url_updator(reqeust):
     print('img_url_updator')
-    products = kicks.objects.all()
+    products = productImg.objects.all()
     print('products size : ', len(products))
     
-    for p in products:
-        print(f'p : {p.local_imageUrl}')
-        p.local_imageUrl = p.local_imageUrl.replace('http://localhost:8000/', '')
-        print(f'p : {p.local_imageUrl}')
+    for i, p in enumerate(products):
+        print(f'p : {p.img_url}')
+        p.img_url = p.img_url.replace('http://localhost:8000/', '')
+        print(f'p : {p.img_url}')
         p.save()
         
     res = HttpResponse('success' + str(len(products)))
