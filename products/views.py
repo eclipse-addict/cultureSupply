@@ -43,16 +43,16 @@ class ProductPagination(CursorPagination):
 class ProductFilter(filters.FilterSet):
     search = filters.CharFilter(method='search_filter', label='Search')
     brand = filters.CharFilter(field_name='brand', lookup_expr='icontains')
+    category = filters.CharFilter(field_name='category', lookup_expr='icontains')
     release_date = filters.CharFilter(method='release_date_filter', label='Release Date Range')
 
     class Meta:
         model = kicks
-        fields = ('search', 'brand', 'release_date')
+        fields = ('search', 'brand', 'category', 'release_date')
         
     def search_filter(self, queryset, name, value):
         print('search_filter')
         keyword = value.replace('+', ' ')
-        
         
         return queryset.filter(
             Q(name__icontains=keyword) | Q(name__icontains=keyword.replace(' ', '')))
@@ -411,33 +411,34 @@ def create_new_kick_data(products_list, p, brand):
                     print(f'product retailPrice updated : {kick.name}')
                     kick.retailPrice = products_list[p]['data'].get('retail_price')
                     result = 1        
-                                    
+            
             if not kick.imageUrl:
                 if products_list[p]['data'].get('image_url'):
                     print(f'product image_url updated : {kick.name}')
                     kick.imageUrl = products_list[p]['data'].get('image_url')
                     result = 1
-                                                
-                        
 
-            if result >0:
+
+
+            if result >0: # 변경사항이 있으면 저장
                 kick.save()
-                return 1
+                return 1 # 변경사항이 있으면 1 리턴
         
-            return 0
+            return 0 # 변경사항이 없으면 0 리턴
+        
     except kicks.DoesNotExist: # 존재하지 않는 제품이므로, 등록 처리
         #TODO: 신제품 등록시 사진 파일도 저장 처리 
         print(f'################New product######################')
-        sku = products_list[p]['data'].get('sku')
-        new_sku = str(sku).replace(' ', '-')
-        date_format = '%Y%m%d'
-        release_Date = products_list[p]['data'].get('release_date')
+        sku = products_list[p]['data'].get('sku') 
+        new_sku = str(sku).replace(' ', '-') # sku에 공백이 있으면 -로 변경
+        date_format = '%Y%m%d' # date format
+        release_Date = products_list[p]['data'].get('release_date') # 
         #if releaseDate is not null format the date to YYYY-MM-DD
-        if release_Date:
-            release_Date = str(release_Date).strip('()').strip(',')
-            release_Date = datetime.datetime.strptime(str(release_Date), date_format)
+        if release_Date: # releaseDate 가 null 이 아니면 
+            release_Date = str(release_Date).strip('()').strip(',') # () , 제거
+            release_Date = datetime.datetime.strptime(str(release_Date), date_format) # date format 변경
             release_Date = str(release_Date.date())
-        kick = kicks(
+        kick = kicks( 
                     uuid                 = products_list[p]['data'].get('id'),
                     name                 = products_list[p].get('value'),
                     brand                = brand,
@@ -451,15 +452,66 @@ def create_new_kick_data(products_list, p, brand):
                     sku                  = new_sku,
                     imageUrl             = products_list[p]['data'].get('image_url'),
                     slug                 = products_list[p]['data'].get('slug')
-
             )
         kick.save()
         
+        if kick.imageUrl and kick.imageUrl.find('stockx')== -1: # kick.imageUrl is not null and not stockx image
+            print(f'Name check (goat):{kick.id} {kick.name}')
+            print(f'URL Check:{kick.imageUrl}')
+            imageUrl = kick.imageUrl # kick.imageUrl 담아놓고
+            
+            # 저장 경로 
+            file_name = os.path.basename(imageUrl)
+            path = urlparse(imageUrl).path
+            path_url = path[:path.find(file_name)]
+                        
+
+            # 설정한 경로에 파일 저장
+            try:                
+                # /var/services/web/kickin/media/images/sneakers/ -> server_path
+                # /Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/ -> local_path
+                req.urlretrieve(imageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name) # 경로에 해당 제품 이미지 저장
+                # 해당 제품 db 업데이트
+                img_url = 'media/images/sneakers/'+file_name # db에 저장할 경로
+                kick.local_imageUrl = img_url # db에 저장할 경로 담아놓고
+                kick.save() # db에 저장
+                
+            except: # 이미지 다운로드 실패시
+                print(f'Error occured')
+                kick.imageUrl = 'media/images/defaultImg.png' # 기본 이미지로 저장
+                kick.save() # db에 저장
+                
+        img_type_list = ['right', 'left', 'back', 'top', 'bottom', 'additional']  # 이미지 타입 리스트 
         
-        # save_product_img(products_list, p, kick)
-        
-        
-        return 1 
+        if kick.local_imageUrl != 'media/images/defaultImg.png': # 기존 이미지가 존재 하는 경우
+            img = productImg(
+                product = kick,
+                img_url = kick.local_imageUrl,
+                type = 'right' # right 이미지만 제품 이미지로 저장
+            )
+            img.save()
+            
+            for type in img_type_list:
+                if type == 'right': # right 이미지는 이미 저장했으므로
+                    continue # 다음 타입으로 넘어감
+                
+                img = productImg( # left, back, top, bottom, additional 이미지 저장
+                    product = kick,
+                    img_url = 'media/images/defaultImg.png',
+                    type = type
+                )
+                img.save() # db에 저장
+            
+        else: # 기본 이미지 없는 경우 타입 리스트 순회하며, 기본 이미지 저장
+            for type in img_type_list: # left, back, top, bottom, additional 이미지 저장
+                img = productImg( #
+                    product = kick,
+                    img_url = 'media/images/defaultImg.png',
+                    type = type
+                )
+                img.save() # db에 저장
+                
+        return 1 # 신제품 등록 처리 완료
 
 def save_product_img(products_list, p, kick):
     img_type_list = ['left', 'back', 'top', 'bottom', 'additional']
