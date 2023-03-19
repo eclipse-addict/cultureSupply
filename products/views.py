@@ -470,7 +470,7 @@ def create_new_kick_data(products_list, p, brand):
             try:                
                 # /var/services/web/kickin/media/images/sneakers/ -> server_path
                 # /Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/ -> local_path
-                req.urlretrieve(imageUrl, '/Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/'+file_name) # 경로에 해당 제품 이미지 저장
+                req.urlretrieve(imageUrl, '/var/services/web/kickin/media/images/sneakers/'+file_name) # 경로에 해당 제품 이미지 저장
                 # 해당 제품 db 업데이트
                 img_url = 'media/images/sneakers/'+file_name # db에 저장할 경로
                 kick.local_imageUrl = img_url # db에 저장할 경로 담아놓고
