@@ -68,8 +68,11 @@ class ProductFilter(filters.FilterSet):
         else:
             # releaseDate가 null이 아닌 경우
             date_range = value.split(',')
-            start_date = date_range[0]
-            end_date = date_range[1]
+            if len(date_range) == 1: #if only 1 date provided, set it as both start and end date
+                start_date = end_date = date_range[0]
+            else:
+                start_date = date_range[0]
+                end_date = date_range[1]
             print(start_date, end_date)
         return queryset.filter(releaseDate__range=[start_date, end_date])
 
