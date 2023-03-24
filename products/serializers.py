@@ -52,7 +52,8 @@ class productSerializer(serializers.ModelSerializer):
         fields = ('reviews', 'productImg', 'count_reviews','avg_rating', 'id', 'brand', 'colorway', 'description', 'category', 
                 'gender', 'name', 'releaseDate', 'retailPrice', 'estimatedMarketValue', 
                 'sku', 'local_imageUrl', 'like_users',)
-    
+        depth = 1
+        
     def get_count_reviews(self, obj):
         return obj.reviews.count()
 
