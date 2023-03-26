@@ -46,10 +46,11 @@ class ProductFilter(filters.FilterSet):
     brand = filters.CharFilter(field_name='brand', lookup_expr='icontains')
     category = filters.CharFilter(field_name='category', lookup_expr='icontains')
     release_date = filters.CharFilter(method='release_date_filter', label='Release Date Range')
+    info_registrequired = filters.CharFilter(method='info_registrequired_filter', label='Info_Regist_Required')
 
     class Meta:
         model = kicks
-        fields = ('search', 'brand', 'category', 'release_date')
+        fields = ('search', 'brand', 'category', 'release_date', 'info_registrequired')
         
     def search_filter(self, queryset, name, value):
         print('search_filter')
@@ -75,7 +76,22 @@ class ProductFilter(filters.FilterSet):
             print(start_date, end_date)
         return queryset.filter(releaseDate__range=[start_date, end_date])
 
-        
+    def info_registrequired_filter(self, queryset, name, value):
+        print('#'*30)
+        print('info_registrequired_filter')
+        print('#'*30)
+        if value == 'true':
+            return queryset.filter(
+                Q(local_imageUrl__icontains='/media/images/defaultImg.png') | 
+                Q(brand__isnull=True) | 
+                Q(category__isnull=True) |
+                Q(releaseDate__isnull=True) |
+                Q(retailPrice__isnull=True) |
+                Q(colorway__isnull=True) |
+                Q(releaseDate__icontains='1900-01-01') 
+                )
+        else:
+            return queryset.all()
 
 class ProductListViewSet(generics.ListAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -173,9 +189,7 @@ def get_detail(request, id):
         Prefetch('reviews', queryset=Review.objects.annotate(
             like_count=Count('like_users'),
             dislike_count=Count('dislike_users')
-        )),
-        'productImg'
-    ), id=id)
+        ))), id=id)
     serializer = productSerializer(kick)
     print(f'res : {serializer.data}')
     return Response(serializer.data)

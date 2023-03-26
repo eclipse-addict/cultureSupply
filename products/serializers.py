@@ -38,19 +38,17 @@ class productListSerializer(serializers.ModelSerializer):
         fields = ('id', 'brand', 'colorway', 'description', 'category', 
                 'gender', 'name', 'releaseDate', 'retailPrice', 'estimatedMarketValue', 
                 'sku', 'imageUrl','local_imageUrl', 'like_users',)
-   
-   
+
 
 
 class productSerializer(serializers.ModelSerializer):    
     reviews       = ReviewListSerializer(many=True, read_only=True)
-    productImg    = ProductImageSerializer(many=True, read_only=True)
     count_reviews = serializers.SerializerMethodField()
     avg_rating    = serializers.SerializerMethodField()
     class Meta:
         model = kicks
-        fields = ('reviews', 'productImg', 'count_reviews','avg_rating', 'id', 'brand', 'colorway', 'description', 'category', 
-                'gender', 'name', 'releaseDate', 'retailPrice', 'estimatedMarketValue', 
+        fields = ('reviews', 'count_reviews','avg_rating', 'id', 'brand', 'colorway', 'description', 'category', 
+                'gender', 'name', 'releaseDate', 'retailPrice',
                 'sku', 'local_imageUrl', 'like_users',)
         depth = 1
         
