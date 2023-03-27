@@ -43,7 +43,7 @@ class ProductPagination(CursorPagination):
 
 class ProductFilter(filters.FilterSet):
     search = filters.CharFilter(method='search_filter', label='Search')
-    brand = filters.CharFilter(field_name='brand', lookup_expr='icontains')
+    brand = filters.CharFilter(method='brand_filter', lookup_expr='icontains')
     category = filters.CharFilter(field_name='category', lookup_expr='icontains')
     release_date = filters.CharFilter(method='release_date_filter', label='Release Date Range')
     info_registrequired = filters.CharFilter(method='info_registrequired_filter', label='Info_Regist_Required')
@@ -58,6 +58,17 @@ class ProductFilter(filters.FilterSet):
         
         return queryset.filter(
             Q(name__icontains=keyword) | Q(name__icontains=keyword.replace(' ', '')))
+        
+    def brand_filter(self, queryset, name, value):
+        print('brand_filter')
+        brand_list = value.split(',')
+        q = Q()
+        for brand in brand_list:
+            q.add(Q(brand__icontains=brand), Q.OR)
+            
+        queryset = queryset.filter(q)
+        
+        return queryset
         
     def release_date_filter(self, queryset, name, value):
         print('release_date_filter')
@@ -89,7 +100,7 @@ class ProductFilter(filters.FilterSet):
                 Q(retailPrice__isnull=True) |
                 Q(colorway__isnull=True) |
                 Q(releaseDate__icontains='1900-01-01') 
-                )
+                ).order_by('-releaseDate')
         else:
             return queryset.all()
 
