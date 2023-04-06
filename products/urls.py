@@ -8,6 +8,7 @@ urlpatterns = [
     path('sneaker/<int:id>/', views.get_detail),
     path('sneaker/like/<int:product_id>/<int:user_id>/', views.product_like),
     path('sneaker/list/', ProductListViewSet.as_view()),
+    path('recent/', views.recent_releases),
     
     # data crwaling activated request
     path('goat/collections/', crawling_views.goat_collections), # goat collections 데이터 크롤링 USING
@@ -16,7 +17,6 @@ urlpatterns = [
     # path('new/', views.new_release_paser),
     # path('brand/', views.sneaker_data_by_brand_paser),
     # path('test/', views.google_img_download),
-    # path('popular/', views.popular_release),
     # path('img/pasing/', views.sneaker_img_paser), # 이미지 다운로더 
     # path('goat/', views.get_goat),
     # path('dup/', views.duplicate_check),

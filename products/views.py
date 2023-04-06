@@ -164,9 +164,9 @@ class ProductListViewSet(generics.ListAPIView):
 '''
 returns 15 most recent drops (no paginations) -> for main page component
 '''
-def popular_release(request):
+def recent_releases(request):
     if request.method == 'GET':
-        product_list = kicks.objects.exclude(local_imageUrl='http://localhost:8000/media/images/defaultImg.png').order_by('-releaseDate')[0:12]
+        product_list = kicks.objects.exclude(local_imageUrl='media/images/defaultImg.png').order_by('-releaseDate')[:15]
         
         serializer = productSerializer(product_list, many=True)
         return JsonResponse(serializer.data, safe=False)
