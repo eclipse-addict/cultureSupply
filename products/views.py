@@ -2,7 +2,7 @@ from django.shortcuts import get_list_or_404, get_object_or_404
 from django.contrib.auth import get_user, get_user_model
 from django.http import HttpResponse, JsonResponse
 from rest_framework.response import Response
-from django.core.paginator import Paginator
+# from django.core.paginator import Paginator
 from django.conf import settings
 from django.db.models import Q, Avg, Count, Prefetch
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -15,24 +15,29 @@ from rest_framework import generics
 from rest_framework import filters
 from .serializers import productListSerializer, productSerializer
 from .models import kicks, productImg
-from datetime import date, timedelta
-import pprint
-import requests
-import json
-import datetime
-import urllib.request as req
-from urllib.parse import urlparse
-import chardet
-import os
-import time
-from yarl import URL
+# from datetime import date, timedelta
+# import pprint
+# import requests
+# import json
+# import datetime
+# import urllib.request as req
+# from urllib.parse import urlparse
+# import chardet
+# import os
+# import time
+# from yarl import URL
 from google_images_download import google_images_download   #importing the library
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 from assets.brand_list import brand_list
-from django.utils import timezone
+# from django.utils import timezone
 from django_filters import rest_framework as filters
 from reviews.models import Review
+from django.db import connection, reset_queries
+
+
 User =  User = get_user_model()
+
+
 
 
 class ProductPagination(CursorPagination):
@@ -51,14 +56,14 @@ class ProductFilter(filters.FilterSet):
     class Meta:
         model = kicks
         fields = ('search', 'brand', 'category', 'release_date', 'info_registrequired')
-        
+    
     def search_filter(self, queryset, name, value):
         print('search_filter')
         keyword = value.replace('+', ' ')
         
         return queryset.filter(
             Q(name__icontains=keyword) | Q(name__icontains=keyword.replace(' ', '')))
-        
+    
     def brand_filter(self, queryset, name, value):
         print('brand_filter')
         brand_list = value.split(',')
@@ -69,7 +74,7 @@ class ProductFilter(filters.FilterSet):
         queryset = queryset.filter(q)
         
         return queryset
-        
+    
     def release_date_filter(self, queryset, name, value):
         print('release_date_filter')
         if not value:
@@ -86,7 +91,7 @@ class ProductFilter(filters.FilterSet):
                 end_date = date_range[1]
             print(start_date, end_date)
         return queryset.filter(releaseDate__range=[start_date, end_date])
-
+    
     def info_registrequired_filter(self, queryset, name, value):
         print('#'*30)
         print('info_registrequired_filter')
@@ -115,50 +120,7 @@ class ProductListViewSet(generics.ListAPIView):
 
 
 
-# class ProductListViewSet(generics.ListAPIView):
-#     permission_classes = (IsAuthenticatedOrReadOnly,)
-#     queryset = kicks.objects.all()
-#     serializer_class = productListSerializer
-#     pagination_class = ProductPagination
-#     # filter_backends = [filters.SearchFilter]
-#     filter_backends = [DjangoFilterBackend]
-#     # search_fields = ['name']
-    
-#     def get_queryset(self):
-#         queryset = kicks.objects.all()
-#         search = self.request.GET.get('search')
-#         brand = self.request.GET.get('brand', None)
-#         releaseDate = self.request.GET.get('releaseDate', None)
-        
-#         if not releaseDate and not search and not brand :
-#             queryset = queryset.filter(Q(releaseDate__range=[date.today() - timedelta(days=15), date.today() + timedelta(days=15)]))
-        
-#         if releaseDate:
-#             release = releaseDate.split(',')
-#             if len(release) == 2:
-#                 queryset = queryset.filter(Q(releaseDate__range=[release[0], release[1]]))
-#             elif len(release) == 1:
-#                 queryset = queryset.filter(Q(releaseDate=release[0]))    
-        
-#         if search:
-#             q = Q()
-#             keyword = search.replace('+', ' ')
-#             q.add(Q(name__icontains=keyword), q.OR) # 검색어 조건 공백 포함 검색
-#             q.add(Q(name__icontains=keyword.replace(' ','')), q.OR) # 검색어 조건 공백 제거 후 붙여서 검색
-#             # //TODO: 주석 처리 23.02.14 -> 검색 결과의 정확도가 떨어짐. ex) jordan 5 로 검색 시, jordan, 5 로 각각 검색한 결과까지 함께 결과에 포함됨. 
-#             # for word in search.split():
-#             #     q.add(Q(name__icontains=word), q.OR)
-                
-#             queryset = queryset.filter(q)
-            
-#         if brand:
-#             brand = brand.split(',')
-#             q = Q()
-#             for b in brand:
-#                 q.add(Q(brand__icontains=b), q.OR)
-#             queryset = queryset.filter(q)
-            
-#         return queryset
+
 
 
 '''
@@ -166,7 +128,7 @@ returns 15 most recent drops (no paginations) -> for main page component
 '''
 def recent_releases(request):
     if request.method == 'GET':
-        product_list = kicks.objects.exclude(local_imageUrl='media/images/defaultImg.png').order_by('-releaseDate')[:15]
+        product_list = kicks.objects.exclude(local_imageUrl='media/images/defaultImg.png').exclude(releaseDate__isnull=True).order_by('-releaseDate')[:15]
         
         serializer = productSerializer(product_list, many=True)
         return JsonResponse(serializer.data, safe=False)
@@ -196,23 +158,21 @@ def main_img(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_detail(request, id):
+    reset_queries()
     kick = get_object_or_404(kicks.objects.prefetch_related(
         Prefetch('reviews', queryset=Review.objects.annotate(
             like_count=Count('like_users'),
             dislike_count=Count('dislike_users')
         ))), id=id)
+    
+    query_info = connection.queries
+    for query in query_info:
+        print(query['sql'])
+        
     serializer = productSerializer(kick)
     print(f'res : {serializer.data}')
     return Response(serializer.data)
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def get_detail(request, id):
-#     kick = get_object_or_404(kicks, id=id)
-    
-#     serializer = productSerializer(kick)
-#     print(f'res : {kick}')
-    
-#     return JsonResponse(serializer.data, safe=True)
+
 
 
 
@@ -228,3 +188,28 @@ def product_like(request, product_id, user_id):
     else:
         kick.like_users.add(user)
         return JsonResponse({'message':'added'}, status = status.HTTP_200_OK)
+
+# def get_sql_queries(original_func):
+# 	def wrapper(*args, **kwargs):
+# 		reset_queries()
+# 		original_func(*args, **kwargs)
+# 		query_info = connection.queries
+# 		for query in query_info:
+# 			print(query['sql'])
+# 		return wrapper
+
+
+
+# @get_sql_queries
+# def select_all_test(request): 
+#     print('select_all_test')
+#     reset_queries()
+#     test_list = kicks.objects.all()
+#     for i in range(2):
+#         print(test_list[i])
+    
+#     query_info = connection.queries
+#     for query in query_info:
+#         print(query['sql'])
+        
+#     return JsonResponse({'message':'success'}, status = status.HTTP_200_OK)
