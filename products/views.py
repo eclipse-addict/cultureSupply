@@ -159,3 +159,5 @@ def product_like(request, product_id, user_id):
     else:
         kick.like_users.add(user)
         return JsonResponse({'message': 'added'}, status=status.HTTP_200_OK)
+
+
