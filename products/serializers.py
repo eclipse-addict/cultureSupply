@@ -32,30 +32,37 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 
-class productListSerializer(serializers.ModelSerializer):   
+class ProductListSerializer(serializers.ModelSerializer):
+    reviews = ReviewListSerializer(many=True, read_only=True)
+    review_count = serializers.IntegerField(read_only=True)
+    like_count = serializers.IntegerField(read_only=True)
     class Meta:
         model = kicks
-        fields = ('id', 'brand', 'colorway', 'description', 'category', 
-                'gender', 'name', 'releaseDate', 'retailPrice', 'estimatedMarketValue', 
-                'sku', 'imageUrl','local_imageUrl', 'like_users',)
-
-
-
-class productSerializer(serializers.ModelSerializer):    
-    reviews       = ReviewListSerializer(many=True, read_only=True)
-    count_reviews = serializers.SerializerMethodField()
-    avg_rating    = serializers.SerializerMethodField()
-    class Meta:
-        model = kicks
-        fields = ('reviews', 'count_reviews','avg_rating', 'id', 'brand', 'colorway', 'description', 'category', 
-                'gender', 'name', 'releaseDate', 'retailPrice',
-                'sku', 'local_imageUrl', 'like_users',)
-        depth = 1
-        
-    def get_count_reviews(self, obj):
-        return obj.reviews.count()
+        fields = ('id', 'brand', 'colorway', 'description', 'category', 'click',
+                  'gender', 'name', 'releaseDate', 'retailPrice', 'estimatedMarketValue',
+                  'sku', 'imageUrl', 'local_imageUrl', 'like_users', 'reviews',
+                  'review_count', 'like_count',)
 
     def get_avg_rating(self, ob):
         # reverse lookup on Reviews using item field
         return ob.reviews.all().aggregate(Avg('rating'))['rating__avg']
+
+class ProductSerializer(serializers.ModelSerializer):
+    reviews = ReviewListSerializer(many=True, read_only=True)
+    review_count = serializers.IntegerField(read_only=True)
+    like_count = serializers.IntegerField(read_only=True)
+    class Meta:
+        model = kicks
+        fields = ('reviews', 'like_count', 'review_count', 'id', 'brand', 'colorway', 'description', 'category',
+                  'gender', 'name', 'releaseDate', 'retailPrice', 'click', 'sku', 'local_imageUrl', 'like_users',)
+        depth = 1
+
+
+    # def get_count_reviews(self, obj):
+    #     return obj.reviews.count()
+    #
+    #
+    # def get_avg_rating(self, ob):
+    #     # reverse lookup on Reviews using item field
+    #     return ob.reviews.all().aggregate(Avg('rating'))['rating__avg']
 
