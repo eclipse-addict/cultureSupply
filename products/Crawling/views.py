@@ -12,7 +12,7 @@ from rest_framework.pagination import PageNumberPagination, CursorPagination
 from rest_framework import status
 from rest_framework import generics
 from rest_framework import filters
-from ..serializers import productListSerializer, productSerializer
+from ..serializers import ProductListSerializer, ProductSerializer
 from ..models import kicks, productImg
 from datetime import date, timedelta
 import pprint
@@ -25,7 +25,7 @@ import chardet
 import os
 import time
 from yarl import URL
-from google_images_download import google_images_download   #importing the library
+from google_images_download import google_images_download
 from bs4 import BeautifulSoup
 from assets.brand_list import brand_list
 from django.utils import timezone
