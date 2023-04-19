@@ -12,7 +12,7 @@ from rest_framework.pagination import PageNumberPagination, CursorPagination
 from rest_framework import status
 from rest_framework import generics
 from rest_framework import filters
-from ..serializers import ProductListSerializer, ProductSerializer
+from ..serializers import  ProductSerializer
 from ..models import kicks, productImg
 from datetime import date, timedelta
 import pprint
