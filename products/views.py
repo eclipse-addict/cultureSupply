@@ -12,7 +12,7 @@ from rest_framework.pagination import PageNumberPagination, CursorPagination
 from rest_framework import status
 from rest_framework import generics
 from rest_framework import filters
-from .serializers import ProductListSerializer, ProductSerializer
+from .serializers import ProductSerializer, RecentReleaseSerializers
 from .models import kicks, productImg
 from google_images_download import google_images_download
 from assets.brand_list import brand_list
@@ -87,8 +87,9 @@ class ProductListViewSet(generics.ListAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = kicks.objects.prefetch_related('reviews',
                                               'like_users').annotate(review_count=Count('reviews'),
-                                                                     like_count=Count('like_users'))
-    serializer_class = ProductListSerializer
+                                                                     like_count=Count('like_users'),
+                                                                     rating_avg=Avg('reviews__rating'))
+    serializer_class = ProductSerializer
     pagination_class = ProductPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
@@ -99,36 +100,15 @@ returns 15 most recent drops (no paginations) -> for main page component
 '''
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def recent_releases(request):
     if request.method == 'GET':
         product_list = kicks.objects.exclude(local_imageUrl='media/images/defaultImg.png').exclude(
             releaseDate__isnull=True).order_by('-releaseDate')[:15]
 
-        serializer = ProductSerializer(product_list, many=True)
-        return JsonResponse(serializer.data, safe=False)
-    else:
-        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-
-
-'''
-메인 페이지용, 신제품 선택 def
-최근 등록된 15개 중 사진 file 을 가지고있고, 그중 기대 리셀가가 가장 높은 제품 1종 Return 
-'''
-
-
-def main_img(request):
-    if request.method == 'GET':
-        product_list = kicks.objects.exclude(
-            local_imageUrl='http://localhost:8000/media/images/defaultImg.png').order_by('-releaseDate',
-                                                                                         '-estimatedMarketValue')[:25]
-        main_img = product_list[0]
-        result = []
-        for p in product_list:
-            if main_img.estimatedMarketValue < p.estimatedMarketValue:
-                main_img = p
-                result.append(main_img)
-        serializer = ProductListSerializer(result[:2], many=True)
-        return JsonResponse(serializer.data, safe=False)
+        serializer = RecentReleaseSerializers(product_list, many=True)
+        return Response(serializer.data)
     else:
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
@@ -138,7 +118,8 @@ def main_img(request):
 def get_detail(request, prd_id):
     kick = kicks.objects.prefetch_related('reviews',
                                           'like_users').annotate(review_count=Count('reviews'),
-                                                                 like_count=Count('like_users')).get(pk=prd_id)
+                                                                 like_count=Count('like_users'),
+                                                                 rating_avg=Avg('reviews__rating')).get(pk=prd_id)
 
     # 조회수 증가
     kick.click += 1

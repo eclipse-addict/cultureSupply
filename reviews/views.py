@@ -25,7 +25,7 @@ def get_review_list(reqeust, product_id):
 
 
 
-@api_view(['POST', 'PUT',])
+@api_view(['POST', 'PUT'])
 @permission_classes([IsAuthenticated])
 def create_review(request, product_id, user_id):
     user = User.objects.get(pk=user_id) # request user
