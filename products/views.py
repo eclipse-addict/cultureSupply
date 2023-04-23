@@ -104,8 +104,9 @@ returns 15 most recent drops (no paginations) -> for main page component
 @permission_classes([AllowAny])
 def recent_releases(request):
     if request.method == 'GET':
-        product_list = kicks.objects.exclude(local_imageUrl='media/images/defaultImg.png').exclude(
-            releaseDate__isnull=True).order_by('-releaseDate')[:15]
+        product_list = kicks.objects.exclude(
+            local_imageUrl='media/images/defaultImg.png'
+        ).exclude(releaseDate__isnull=True).order_by('-releaseDate')[:15]
 
         serializer = RecentReleaseSerializers(product_list, many=True)
         return Response(serializer.data)

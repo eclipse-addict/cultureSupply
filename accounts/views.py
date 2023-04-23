@@ -29,38 +29,6 @@ from django.contrib import messages
 User = get_user_model()
 
 
-
-# @api_view(['POST',])
-# @permission_classes([AllowAny])
-# def create_userInfo(request, user_pk):
-#     user = get_object_or_404(User, pk=user_pk)
-    
-#     if request.method == 'POST':
-#         serializer = UserInfoSerializer(data=request.data)
-        
-#         if serializer.is_valid(raise_exception=True):
-#             serializer.save(user=user)
-#             new_user_point(user_pk)
-            
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-
-@api_view(['GET','PUT'])
-@permission_classes([IsAuthenticated])
-def get_update_userInfo(request, user_pk):
-    user = get_object_or_404(User, pk=user_pk)
-    userInfo = get_object_or_404(UserInfo, user=user)
-
-    if request.method == 'GET':
-        serializer = UserInfoSerializer(userInfo)
-        return JsonResponse(serializer.data, safe=False)
-    
-        
-    elif request.method == 'PUT':
-        pass
-
-
 @api_view(['GET',])
 @permission_classes([AllowAny])
 def nick_name_check(request):
@@ -81,38 +49,27 @@ def email_check(request):
         return HttpResponse(status=status.HTTP_226_IM_USED)
     return HttpResponse(status=status.HTTP_200_OK)
 
+
 # 이메일 인증 관련    
 class ConfirmEmailView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, *args, **kwargs):
         self.object = confirmation = self.get_object()
-        print(confirmation)
-        confirmation.confirm(self.request)
-        
-        # 이메일 인증이 성공한 시점에, 유저정보 테이블을 생성한다. 
-        info_table_created = self.create_userInfo()
-        if info_table_created:
+        returned_mail = None
+
+        if type(confirmation) != HttpResponseRedirect:
+            returned_mail = confirmation.confirm(self.request)
+
+        if returned_mail:
             return HttpResponseRedirect('https://www.kickin.kr/')
-        # 이메일 인증이 성공한 뒤, 이메일 인증이 성공했다는 화면으로 이동. 
+
         return HttpResponseRedirect('https://www.kickin.kr/404/')
-    def create_userInfo(self):
-        key = self.kwargs['key']
-        user = EmailConfirmationHMAC.from_key(key).email_address.user
-        userInfo = UserInfo.save(user=user, first_name=user.first_name, last_name=user.last_name, nick_name=user.nick_name)
-        new_user_point(user.pk)
-        
-        if userInfo: 
-            return True
-        
-        return False
 
 
     def get_object(self, queryset=None):
         key = self.kwargs['key']
-        print('key: ', key)
         email_confirmation = EmailConfirmationHMAC.from_key(key)
-        print('email_confirmation: ', email_confirmation)
         if not email_confirmation:
             if queryset is None:
                 queryset = self.get_queryset()
@@ -122,11 +79,12 @@ class ConfirmEmailView(APIView):
                 return HttpResponseRedirect('/login/failure/')
         return email_confirmation
 
+
     def get_queryset(self):
         qs = EmailConfirmation.objects.all_valid()
         qs = qs.select_related("email_address__user")
         return qs
-    
+
     
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -174,7 +132,24 @@ class ResendConfirmationView(View):
         return JsonResponse(data=data, status=status.HTTP_200_OK)
 
 
+@api_view(['GET', 'PUT'])
+@permission_classes([IsAuthenticated])
+def get_update_create_userinfo(request, user_pk):
+    user = get_object_or_404(User, pk=user_pk)
+    user_info, created = UserInfo.objects.get_or_create(user=user)
 
+    if request.method == 'GET':
+        serializer = UserInfoSerializer(user_info)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+    elif request.method == 'PUT':
+        print(request.data)
+        serializer = UserInfoSerializer(user_info, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
