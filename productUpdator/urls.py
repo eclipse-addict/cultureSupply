@@ -1,8 +1,12 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 from . import views
+from django.urls import path, include
+from rest_framework import routers
+from .views import UpdatorViewSet
+
+router = routers.DefaultRouter()
+router.register(r'updators', UpdatorViewSet)
 
 urlpatterns = [
-    path('create/updator/',views.create_updator),
-    path('updator/list/',views.get_updator_list),
+    path('', include(router.urls)),
+    path('create/updator/', views.create_updator),
 ]

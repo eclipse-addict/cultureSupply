@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from django.shortcuts import render, get_object_or_404
 from cultureSupply.settings import SECRET_KEY
-from points.views import new_user_point
+from points.views import new_user_point, create_point_history
 from django.contrib.auth import get_user_model
 from allauth.account.models import EmailConfirmation, EmailAddress
 from django.utils.decorators import method_decorator
@@ -24,7 +24,8 @@ from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
-from django.contrib import messages
+from points.models import Point
+
 
 User = get_user_model()
 
@@ -136,7 +137,14 @@ class ResendConfirmationView(View):
 @permission_classes([IsAuthenticated])
 def get_update_create_userinfo(request, user_pk):
     user = get_object_or_404(User, pk=user_pk)
-    user_info, created = UserInfo.objects.get_or_create(user=user)
+    user_info, user_created = UserInfo.objects.get_or_create(user=user)
+    user_point, point_row_created = Point.objects.get_or_create(user=user)
+
+    # if it's the first time login, and just created a new row in Point table
+    if point_row_created:
+        user_point.current_point = 1000
+        user_point.save()
+        create_point_history(1000, user, '회원 가입', 'add')
 
     if request.method == 'GET':
         serializer = UserInfoSerializer(user_info)

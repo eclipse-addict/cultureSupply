@@ -3,8 +3,6 @@ from products.models import kicks as product
 from django.conf import settings
 
 
-
-
 # Create your models here.
 class ProductUpdator(models.Model):
     """_summary_
@@ -13,11 +11,10 @@ class ProductUpdator(models.Model):
     Args:
         models (_type_): _description_
     """
-    user        = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    product_id  = models.ForeignKey(product, on_delete=models.CASCADE, related_name='productUpdator')
-    
-    
-    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    product_id = models.ForeignKey(product, on_delete=models.CASCADE, related_name='productUpdator')
+
+
 class ProductUpdatorItems(models.Model):
     """_summary_
         위 productUpdator 모델당 여러개의 업데이트 정보를 갖는다 . 
@@ -26,10 +23,9 @@ class ProductUpdatorItems(models.Model):
         models (_type_): _description_
     """
     product_updator_id = models.ForeignKey(ProductUpdator, on_delete=models.CASCADE, related_name='productUpdatorItems')
-    field_name  = models.CharField(max_length=100, null=False, blank=False,)
-    field_value = models.CharField(max_length=2500, null=False, blank=False,)
-    image       = models.ImageField(upload_to='productUpdator/', null=True, blank=True)
-    aproved     = models.BooleanField(default=False) # 제품 정보 업데이트 요청이 승인되었는지 여부
-    created_at  = models.DateTimeField(auto_now_add=True)
-    updated_at  = models.DateTimeField(auto_now=True)
-
+    field_name = models.CharField(max_length=100, null=False, blank=False, )
+    field_value = models.CharField(max_length=2500, null=False, blank=False, )
+    image = models.ImageField(upload_to='productUpdator/', null=True, blank=True,)
+    aproved = models.BooleanField(default=False)  # 제품 정보 업데이트 승인 여부
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

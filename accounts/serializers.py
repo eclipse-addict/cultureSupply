@@ -1,4 +1,5 @@
 from .models import User, UserInfo
+from points.models import Point, PointHistory
 from rest_framework import serializers
 from django.utils import timezone
 from allauth.account.adapter import get_adapter
@@ -51,8 +52,26 @@ class UserSerializer(serializers.ModelSerializer):
         return user
     
 class UserInfoSerializer(serializers.ModelSerializer):
+    class UserPointSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Point
+            fields = ('current_points', 'used_points')
+
+    points = UserPointSerializer(source='user.point')
+    user = UserSerializer()
     
     class Meta:
         model = UserInfo
+        fields = ('user', 'first_name', 'last_name', 'nick_name', 'profile_img', 'gender',
+                  'shoeSize', 'topSize', 'bottomSize', 'zipCode', 'address', 'address_detail', 'points',)
+        depth = 1
+        read_only_fields = ('user',)
+
+
+class UserPointHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PointHistory
         fields = '__all__'
-        read_only_fields = ( 'user',)
+        read_only_fields = ('user',)
+
+
