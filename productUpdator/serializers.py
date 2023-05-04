@@ -1,23 +1,32 @@
 #serializer for productupdater
 from rest_framework import serializers
 from .models import ProductUpdator, ProductUpdatorItems
+from products.serializers import ProductSerializer
+from products.models import kicks as product
 
 
-class productUpdatorItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductUpdatorItems
-        fields = '__all__'
+
         
         
         
-class productUpdatorSerializer(serializers.ModelSerializer):
-    
-    updater_itmes = productUpdatorItemSerializer(many=True, read_only=True)
-    
-    
+class ProductUpdatorSerializer(serializers.ModelSerializer):
+    class ProductForUpdatorSerializer(serializers.ModelSerializer):
+
+        class Meta:
+            model = product
+            fields = ('name',)
+    class ProductUpdatorItemSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = ProductUpdatorItems
+            fields = '__all__'
+
+    productUpdatorItems = ProductUpdatorItemSerializer(many=True, read_only=True)
+    product_info = ProductForUpdatorSerializer(source='product')
     class Meta:
         model = ProductUpdator
-        fields = ('user', 'product_id', 'updater_itmes',)
+        fields = ('user', 'product', 'productUpdatorItems', 'product_info',)
+
+
     
         
         

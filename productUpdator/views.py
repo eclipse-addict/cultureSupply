@@ -1,5 +1,5 @@
 from .models import ProductUpdator, ProductUpdatorItems
-from .serializers import productUpdatorSerializer
+from .serializers import ProductUpdatorSerializer
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -11,38 +11,52 @@ from rest_framework import status
 @api_view(['POST',])
 @permission_classes([IsAuthenticated])
 def create_updator(request):
-    """_summary_
-        authenticated user can create a product updator which is a list of items to update.
-    Args:
-        reqeust (_type_): _description_
-    """
-    print(f'request : {request}')
-    img_file = request.data.pop('local_imageUrl')
-    # print(f'img_file : {img_file}')
-    print(f'reqeust.data : {request.data}')
-    print(f'request.file : {request.FILES}')
-    # updator_items = reqeust.data["updater_itmes"] # 받아서 -> 딕셔너리로 변환 -> 회문 돌면서 저장. 
-    serializer = productUpdatorSerializer(data=request.data)
+    updatorItems = []
+    brand, colorway, category, retail, date, local_imageUrl = None, None, None, None, None, None
 
-    if serializer.is_valid(raise_exception=True):
+    if request.data.get('brand'):
+        brand = request.data.pop('brand')
+    if request.data.get('color_select'):
+        colorway = request.data.pop('color_select')
+    if request.data.get('category_select'):
+        category = request.data.pop('category_select')
+    if request.data.get('retail'):
+        retail = request.data.pop('retail')
+    if request.data.get('date'):
+        date = request.data.pop('date')
+    if request.data.get('local_imageUrl'):
+        local_imageUrl = request.data.pop('local_imageUrl')
+
+    print(f'request.data : {request.data}')
+    serializer = ProductUpdatorSerializer(data=request.data)
+
+    if serializer.is_valid():  # 에러 위치 확인 valid 통과를 하지 못함.
         updator = serializer.save()
+    else:
+        print(f'serializer.errors : {serializer.errors}')
+        return HttpResponse(content={'message': 'fail'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if request.FILES:
-            print('#'*100)
-            print(f'request.FILES : {request.FILES}')
-            ProductUpdatorItems.objects.create(product_updator_id=updator,
-                                               field_name='local_imageUrl',
-                                               field_value='local_imageUrl',
-                                               image=request.FILES['local_imageUrl'])
+    if request.FILES:
+        print('#'*100)
+        print(f'request.FILES : {request.FILES}')
+        ProductUpdatorItems.objects.create(product_updator_id=updator,
+                                           field_name='local_imageUrl',
+                                           field_value='local_imageUrl',
+                                           image=request.FILES['local_imageUrl'])
 
-        excluding_fields = ['user', 'product_id']
-        for name in request.data:
-            print(f'name : {name}, value : {request.data[name]}')
-            if name not in excluding_fields:
-                print(f'not img : {request.data[name]}')
-                ProductUpdatorItems.objects.create(product_updator_id=updator,
-                                                   field_name=name,
-                                                   field_value=request.data[name])
+    if brand:
+        updatorItems.append(ProductUpdatorItems(product_updator_id=updator, field_name='brand', field_value=brand))
+    if colorway:
+        updatorItems.append(ProductUpdatorItems(product_updator_id=updator, field_name='colorway', field_value=colorway))
+    if category:
+        updatorItems.append(ProductUpdatorItems(product_updator_id=updator, field_name='category', field_value=category))
+    if retail:
+        updatorItems.append(ProductUpdatorItems(product_updator_id=updator, field_name='retail', field_value=retail))
+    if date:
+        updatorItems.append(ProductUpdatorItems(product_updator_id=updator, field_name='release_date', field_value=date))
+
+    if updatorItems:
+        ProductUpdatorItems.objects.bulk_create(updatorItems)
 
 
     return HttpResponse(content={'message': 'success'}, status=status.HTTP_201_CREATED)
@@ -55,7 +69,7 @@ class PostPageNumberPagination(PageNumberPagination):
 
 class UpdatorViewSet(ModelViewSet):
     queryset = ProductUpdator.objects.prefetch_related('productUpdatorItems')
-    serializer_class = productUpdatorSerializer
+    serializer_class = ProductUpdatorSerializer
     pagination_class = PostPageNumberPagination
     permission_classes = [IsAdminUser]
 
