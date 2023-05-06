@@ -21,10 +21,10 @@ class ProductUpdatorSerializer(serializers.ModelSerializer):
             fields = '__all__'
 
     productUpdatorItems = ProductUpdatorItemSerializer(many=True, read_only=True)
-    product_info = ProductForUpdatorSerializer(source='product')
+    product_info = ProductForUpdatorSerializer(source='product', required=False)
     class Meta:
         model = ProductUpdator
-        fields = ('user', 'product', 'productUpdatorItems', 'product_info',)
+        fields = ('pk', 'user', 'created_at', 'product', 'final_approved', 'total_point', 'productUpdatorItems', 'product_info', )
 
 
     

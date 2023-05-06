@@ -9,4 +9,5 @@ router.register(r'updators', UpdatorViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('create/updator/', views.create_updator),
+    path('accpet/<int:pk>/', views.accept_updator),
 ]

@@ -12,7 +12,11 @@ class ProductUpdator(models.Model):
         models (_type_): _description_
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    product_id = models.ForeignKey(product, on_delete=models.CASCADE, related_name='productUpdator')
+    product = models.ForeignKey(product, on_delete=models.CASCADE, related_name='productUpdator')
+    final_approved = models.IntegerField(default=0)  # 제품 정보 업데이트 승인 여부 // 정보 확인 중(0), 승인 완료(1), 반려(2)
+    total_point = models.PositiveBigIntegerField(default=0)  # 제품 정보 업데이트 승인 여부
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class ProductUpdatorItems(models.Model):
@@ -26,6 +30,5 @@ class ProductUpdatorItems(models.Model):
     field_name = models.CharField(max_length=100, null=False, blank=False, )
     field_value = models.CharField(max_length=2500, null=False, blank=False, )
     image = models.ImageField(upload_to='productUpdator/', null=True, blank=True,)
-    aproved = models.BooleanField(default=False)  # 제품 정보 업데이트 승인 여부
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    approved = models.BooleanField(default=False)  # 제품 정보 업데이트 승인 여부
+

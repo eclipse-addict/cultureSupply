@@ -53,7 +53,7 @@ class UserInfo(models.Model):
     first_name = models.CharField(max_length=200, default='', blank=True, null=True)
     last_name = models.CharField(max_length=200, default='', blank=True, null=True)
     nick_name = models.CharField(max_length=200, default='', blank=True, null=True)
-    profile_img = models.ImageField(upload_to='user/', blank=True, null=True, default='media/images/user.png')
+    profile_img = models.ImageField(upload_to='user/', blank=True, null=True, default='images/user.png')
 
     gender = models.CharField(max_length=10, default='', null=True, blank=True)
     shoeSize = models.CharField(max_length=10, default='', null=True, blank=True)

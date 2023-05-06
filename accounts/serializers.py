@@ -57,8 +57,8 @@ class UserInfoSerializer(serializers.ModelSerializer):
             model = Point
             fields = ('current_points', 'used_points')
 
-    points = UserPointSerializer(source='user.point')
-    user = UserSerializer()
+    points = UserPointSerializer(source='user.point', required=False)
+    user = UserSerializer(read_only=True)
     
     class Meta:
         model = UserInfo
