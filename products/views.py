@@ -18,6 +18,7 @@ from google_images_download import google_images_download
 from assets.brand_list import brand_list
 from django_filters import rest_framework as filters
 from reviews.models import Review
+import re
 
 User = get_user_model()
 
@@ -42,9 +43,15 @@ class ProductFilter(filters.FilterSet):
 
     def search_filter(self, queryset, name, value):
         keyword = value.replace('+', ' ')
+        keyword_regex = re.sub(r'\s+', r'\\s*', keyword)
+
+        # Add space between the letters in the keyword if they are not already separated by space
+        keyword_with_space = re.sub(r'(?<=\D)(?=\d)|(?<=\d)(?=\D)', ' ', keyword)
 
         return queryset.filter(
-            Q(name__icontains=keyword) | Q(name__icontains=keyword.replace(' ', '')))
+            Q(name__icontains=keyword) |
+            Q(name__iregex=fr'{keyword_regex}') |
+            Q(name__icontains=keyword_with_space))
 
     def brand_filter(self, queryset, name, value):
         brand_list = value.split(',')
