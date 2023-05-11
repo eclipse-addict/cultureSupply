@@ -36,10 +36,20 @@ class ProductFilter(filters.FilterSet):
     category = filters.CharFilter(field_name='category', lookup_expr='icontains')
     release_date = filters.CharFilter(method='release_date_filter', label='Release Date Range')
     info_registrequired = filters.CharFilter(method='info_registrequired_filter', label='Info_Regist_Required')
+    main_page = filters.CharFilter(method='main_page_filter', label='Main_Page_Filter')
 
     class Meta:
         model = kicks
-        fields = ('search', 'brand', 'category', 'release_date', 'info_registrequired')
+        fields = ('search', 'brand', 'category', 'release_date', 'info_registrequired', 'main_page')
+
+    def main_page_filter(self, queryset, name, value):
+        print('main_page_filter')
+        if value == 'most_viewed':
+            print('most_viewed')
+            ProductPagination.ordering = '-click'
+
+            return queryset
+
 
     def search_filter(self, queryset, name, value):
         keyword = value.replace('+', ' ')
@@ -103,7 +113,7 @@ class ProductListViewSet(generics.ListAPIView):
 
 
 '''
-returns 15 most recent drops (no paginations) -> for main page component
+for main page component
 '''
 
 
