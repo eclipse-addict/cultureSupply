@@ -19,6 +19,7 @@ from assets.brand_list import brand_list
 from django_filters import rest_framework as filters
 from reviews.models import Review
 import re
+import time
 
 User = get_user_model()
 
@@ -36,19 +37,23 @@ class ProductFilter(filters.FilterSet):
     category = filters.CharFilter(field_name='category', lookup_expr='icontains')
     release_date = filters.CharFilter(method='release_date_filter', label='Release Date Range')
     info_registrequired = filters.CharFilter(method='info_registrequired_filter', label='Info_Regist_Required')
-    main_page = filters.CharFilter(method='main_page_filter', label='Main_Page_Filter')
+    ordering = filters.CharFilter(method='order_filter', label='order_filter')
 
     class Meta:
         model = kicks
-        fields = ('search', 'brand', 'category', 'release_date', 'info_registrequired', 'main_page')
+        fields = ('search', 'brand', 'category', 'release_date', 'info_registrequired', 'ordering')
 
-    def main_page_filter(self, queryset, name, value):
+    def order_filter(self, queryset, name, value):
         print('main_page_filter')
-        if value == 'most_viewed':
-            print('most_viewed')
+        if value == 'click':
+            print('Order by Click')
             ProductPagination.ordering = '-click'
 
-            return queryset
+        elif value == 'all':
+            print('Order by releaseDate')
+            ProductPagination.ordering = '-releaseDate'
+
+        return queryset
 
 
     def search_filter(self, queryset, name, value):
@@ -86,16 +91,26 @@ class ProductFilter(filters.FilterSet):
         return queryset.filter(releaseDate__range=[start_date, end_date])
 
     def info_registrequired_filter(self, queryset, name, value):
-        if value == 'true':
-            return queryset.filter(
-                Q(local_imageUrl__icontains='media/images/defaultImg.png') |
-                Q(brand__isnull=True) |
-                Q(category__isnull=True) |
-                Q(releaseDate__isnull=True) |
-                Q(retailPrice__isnull=True) |
-                Q(colorway__isnull=True) |
-                Q(releaseDate__icontains='1900-01-01')
-            ).order_by('-releaseDate')
+        if value:
+            value_list = value.split(',')
+
+            q = Q()
+
+            for value in value_list:
+                if value == 'brand':
+                    q &= Q(brand__isnull=True)
+                elif value == 'category':
+                    q &= Q(category='')
+                elif value == 'date':
+                    q &= (Q(releaseDate__isnull=True) |
+                          Q(releaseDate='1900-00-00') |
+                          Q(releaseDate='1970-01-01'))
+                elif value == 'price':
+                    q &= Q(retailPrice__isnull=True) | Q(retailPrice=0)
+                elif value == 'image':
+                    q &= Q(local_imageUrl__icontains='defaultImg.png')
+
+            return queryset.filter(q).order_by('-releaseDate')
         else:
             return queryset.order_by('-releaseDate')
 
@@ -110,6 +125,17 @@ class ProductListViewSet(generics.ListAPIView):
     pagination_class = ProductPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
+
+    def list(self, request, *args, **kwargs):
+        start_time = time.time()
+
+        response = super().list(request, *args, **kwargs)
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print(f"Execution Time: {execution_time} seconds")
+
+        return response
 
 
 '''
