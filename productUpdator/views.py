@@ -10,6 +10,7 @@ from rest_framework import status
 from products.models import kicks as Product
 from points.models import Point, PointHistory
 
+
 class PostPageNumberPagination(PageNumberPagination):
     page_size = 20
 
@@ -18,9 +19,20 @@ class UpdatorViewSet(ModelViewSet):
     queryset = ProductUpdator.objects.prefetch_related('productUpdatorItems').order_by('-created_at')
     serializer_class = ProductUpdatorSerializer
     pagination_class = PostPageNumberPagination
-    permission_classes = [IsAdminUser]
 
-@api_view(['POST',])
+    def get_queryset(self):
+        user = self.request.query_params.get('user', None)
+        if user:
+            return ProductUpdator.objects.filter(user=user).order_by('-created_at')
+        else:
+            return ProductUpdator.objects.prefetch_related('productUpdatorItems').order_by('-created_at')
+    def get_permissions(self):
+        if 'user' in self.request.query_params:
+            return [IsAuthenticated()]
+        else:
+            return [IsAdminUser()]
+
+@api_view(['POST', ])
 @permission_classes([IsAuthenticated])
 def create_updator(request):
     updatorItems = []
@@ -52,7 +64,7 @@ def create_updator(request):
         return HttpResponse(content={'message': 'fail'}, status=status.HTTP_400_BAD_REQUEST)
 
     if request.FILES:
-        print('#'*100)
+        print('#' * 100)
         print(f'request.FILES : {request.FILES}')
         ProductUpdatorItems.objects.create(product_updator_id=updator,
                                            field_name='local_imageUrl',
@@ -62,20 +74,24 @@ def create_updator(request):
     if brand:
         updatorItems.append(ProductUpdatorItems(product_updator_id=updator, field_name='brand', field_value=brand))
     if colorway:
-        updatorItems.append(ProductUpdatorItems(product_updator_id=updator, field_name='colorway', field_value=colorway))
+        updatorItems.append(
+            ProductUpdatorItems(product_updator_id=updator, field_name='colorway', field_value=colorway))
     if category:
-        updatorItems.append(ProductUpdatorItems(product_updator_id=updator, field_name='category', field_value=category))
+        updatorItems.append(
+            ProductUpdatorItems(product_updator_id=updator, field_name='category', field_value=category))
     if retail:
         updatorItems.append(ProductUpdatorItems(product_updator_id=updator, field_name='retail', field_value=retail))
     if date:
-        updatorItems.append(ProductUpdatorItems(product_updator_id=updator, field_name='release_date', field_value=date))
+        updatorItems.append(
+            ProductUpdatorItems(product_updator_id=updator, field_name='release_date', field_value=date))
 
     if updatorItems:
         ProductUpdatorItems.objects.bulk_create(updatorItems)
 
     return HttpResponse(content={'message': 'success'}, status=status.HTTP_201_CREATED)
 
-@api_view(['POST',])
+
+@api_view(['POST', ])
 @permission_classes([IsAuthenticated])
 def accept_updator(request, pk):
     updator = ProductUpdator.objects.get(pk=pk)
@@ -106,17 +122,7 @@ def accept_updator(request, pk):
     point.current_points += len(updator_items) * 100
     point.save()
 
-    PointHistory.objects.create(user=updator.user, point_type='Product_update', point_amount=len(updator_items) * 100, description='상품 업데이트 승인')
+    PointHistory.objects.create(user=updator.user, point_type='Product_update', point_amount=len(updator_items) * 100,
+                                description='상품 업데이트 승인')
 
     return HttpResponse(content={'message': 'success'}, status=status.HTTP_200_OK)
-
-
-
-
-
-
-
-
-
-
-

@@ -20,6 +20,9 @@ from django_filters import rest_framework as filters
 from reviews.models import Review
 import re
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -49,12 +52,16 @@ class ProductFilter(filters.FilterSet):
             print('Order by Click')
             ProductPagination.ordering = '-click'
 
-        elif value == 'all':
-            print('Order by releaseDate')
+        elif value == 'most_commented':
+            print('Order by most_hyped')
+            queryset = queryset.annotate(review_count=Count('reviews')).order_by('-review_count')
+            ProductPagination.ordering = '-review_count'
+
+        else:
+            print('Order by recent_drop')
             ProductPagination.ordering = '-releaseDate'
 
         return queryset
-
 
     def search_filter(self, queryset, name, value):
         keyword = value.replace('+', ' ')
@@ -96,6 +103,12 @@ class ProductFilter(filters.FilterSet):
 
             q = Q()
 
+            if len(value_list) == 5:
+                print('all condition')
+                q &= (Q(brand__isnull=True) | Q(category='') | (Q(releaseDate__isnull=True) | Q(releaseDate='1900-00-00') | Q(releaseDate='1970-01-01')) | Q(retailPrice__isnull=True) | Q(retailPrice=0) | Q(local_imageUrl__icontains='defaultImg.png'))
+
+                return queryset.filter(q).order_by('-releaseDate')
+
             for value in value_list:
                 if value == 'brand':
                     q &= Q(brand__isnull=True)
@@ -133,6 +146,7 @@ class ProductListViewSet(generics.ListAPIView):
 
         end_time = time.time()
         execution_time = end_time - start_time
+        logger.info(f"Execution Time: {execution_time} seconds")
         print(f"Execution Time: {execution_time} seconds")
 
         return response
@@ -184,5 +198,3 @@ def product_like(request, product_id, user_id):
     else:
         kick.like_users.add(user)
         return JsonResponse({'message': 'added'}, status=status.HTTP_200_OK)
-
-

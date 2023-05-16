@@ -77,7 +77,7 @@ new_release_url = getattr(settings, 'NEW_RELEASE_URL', None)
 
 
 
-# TODO: 카테고리 별 제품 파싱 :
+#  카테고리 별 제품 파싱 :
 # Sneakers : 1968 ~ 2023
 # T-Shirts : 1990 ~ 2023 
 # Apparel : 1970 ~ 2023
@@ -122,7 +122,7 @@ def goat_collections(request):
     print(f'total New product count = {new_cnt}')
     print(f'time check : {time.time() - start}')
     
-    return HttpResponse(status=status.HTTP_201_CREATED)
+    return HttpResponse(content={'new_cnt': new_cnt, 'spent_time': time.time() - start}, status=status.HTTP_201_CREATED)
 # 284,361 /200 = // current 21 page 
 def get_goat(request):
     # request_URL = 'https://ac.cnstrc.com/browse/brand/air%20jordan?c=ciojs-client-2.29.12&key=key_XT7bjdbvjgECO5d8&i=6af107e4-772b-4fae-bff6-510ed4c70068&s=3&page=1&num_results_per_page=24&filters%5Brelease_date_year%5D=1985&fmt_options%5Bhidden_fields%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_fields%5D=gp_instant_ship_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_lowest_price_cents_3&fmt_options%5Bhidden_facets%5D=gp_instant_ship_lowest_price_cents_3&_dt=1670597951900'
@@ -257,7 +257,6 @@ def create_new_kick_data(products_list, p, brand):
             return 0 # 변경사항이 없으면 0 리턴
         
     except kicks.DoesNotExist: # 존재하지 않는 제품이므로, 등록 처리
-        #TODO: 신제품 등록시 사진 파일도 저장 처리 
         print(f'################New product######################')
         sku = products_list[p]['data'].get('sku') 
         new_sku = str(sku).replace(' ', '-') # sku에 공백이 있으면 -로 변경
