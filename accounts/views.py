@@ -149,9 +149,7 @@ def get_update_create_userinfo(request, user_pk):
     if request.method == 'GET':
         serializer = UserInfoSerializer(user_info)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
     elif request.method == 'PUT':
-        print(request.data)
         serializer = UserInfoSerializer(user_info, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -160,4 +158,3 @@ def get_update_create_userinfo(request, user_pk):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(status=status.HTTP_400_BAD_REQUEST)
-
