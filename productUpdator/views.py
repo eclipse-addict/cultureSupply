@@ -12,7 +12,7 @@ from points.models import Point, PointHistory
 
 
 class PostPageNumberPagination(PageNumberPagination):
-    page_size = 20
+    page_size = 5
 
 
 class UpdatorViewSet(ModelViewSet):
@@ -22,10 +22,30 @@ class UpdatorViewSet(ModelViewSet):
 
     def get_queryset(self):
         user = self.request.query_params.get('user', None)
+        condition = self.request.query_params.get('condition', None)
+        condition = int(condition)
         if user:
-            return ProductUpdator.objects.filter(user=user).order_by('-created_at')
+            if condition == 0:
+                print('request with user  condition == 0')
+                return ProductUpdator.objects.prefetch_related('productUpdatorItems').filter(user=user).filter(final_approved=0).order_by('-created_at')
+            elif condition == 1:
+                print('request with user  condition == 1')
+                return ProductUpdator.objects.prefetch_related('productUpdatorItems').filter(user=user).filter(final_approved=1).order_by('-created_at')
+            elif condition == 2:
+                print('request with user  condition == 2')
+                return ProductUpdator.objects.prefetch_related('productUpdatorItems').filter(user=user).filter(final_approved=2).order_by('-created_at')
+            else:
+                print('request with user  condition == else')
+                return ProductUpdator.objects.prefetch_related('productUpdatorItems').filter(user=user).order_by('-created_at')
         else:
-            return ProductUpdator.objects.prefetch_related('productUpdatorItems').order_by('-created_at')
+            if condition == 0:
+                return ProductUpdator.objects.prefetch_related('productUpdatorItems').filter(final_approved=0).order_by('-created_at')
+            elif condition == 1:
+                return ProductUpdator.objects.prefetch_related('productUpdatorItems').filter(final_approved=1).order_by('-created_at')
+            elif condition == 2:
+                return ProductUpdator.objects.prefetch_related('productUpdatorItems').filter(final_approved=2).order_by('-created_at')
+            else:
+                return ProductUpdator.objects.prefetch_related('productUpdatorItems').order_by('-created_at')
     def get_permissions(self):
         if 'user' in self.request.query_params:
             return [IsAuthenticated()]
@@ -124,5 +144,15 @@ def accept_updator(request, pk):
 
     PointHistory.objects.create(user=updator.user, point_type='Product_update', point_amount=len(updator_items) * 100,
                                 description='상품 업데이트 승인')
+
+    return HttpResponse(content={'message': 'success'}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST', ])
+@permission_classes([IsAuthenticated])
+def deny_updator(request, pk):
+    updator = ProductUpdator.objects.get(pk=pk)
+    updator.final_approved = 2 # 2 : denied
+    updator.save()
 
     return HttpResponse(content={'message': 'success'}, status=status.HTTP_200_OK)

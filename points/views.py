@@ -1,7 +1,12 @@
 from django.contrib.auth import get_user_model
-from .serializers import PointHistory, PointSerializer
+from django.http import HttpResponse
+from .serializers import PointHistorySerializer, PointSerializer
+from rest_framework.pagination import PageNumberPagination
 from .models import Point, PointHistory
-
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import status
 
 
 '''
@@ -54,8 +59,48 @@ def add_use_point(point, user_id, activity, kind):
     point_row.save()
     create_point_history(point, user, activity, kind)     
 
+api_view(['GET',])
+
 
 
 def create_point_history(point, user, activity, kind):
     point_history = PointHistory(user=user, description=activity, point_amount=point, point_type=kind)
     point_history.save()
+
+
+class PointHistoryPagination(PageNumberPagination):
+    page_size = 2
+
+class PointHistoryViewSet(ModelViewSet):
+    queryset = PointHistory.objects.all()
+    serializer_class = PointHistorySerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = PointHistoryPagination
+
+    def get_queryset(self):
+        user = self.request.user
+        return PointHistory.objects.filter(user=user)
+    #
+    # def perform_create(self, serializer):
+    #     user = self.request.user
+    #     serializer.save(user=user)
+    #
+    # def perform_update(self, serializer):
+    #     user = self.request.user
+    #     serializer.save(user=user)
+    #
+    # def perform_destroy(self, instance):
+    #     instance.delete()
+
+
+
+
+@permission_classes([IsAuthenticated])
+def get_point_history(request, id):
+    user = User.objects.get(pk=id)
+    point_history = PointHistory.objects.filter(user=user)
+    serializer = PointSerializer(point_history, many=True)
+
+    return HttpResponse(serializer.data, status=status.HTTP_200_OK)
+
+
