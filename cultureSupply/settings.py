@@ -52,9 +52,11 @@ NEW_RELEASE_URL = get_secret("new_release_url")
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS=['https://kickin.co.kr','https://www.kickin.co.kr','https://kickin.kr', 'https://www.kickin.kr', 'localhost', '127.0.0.0','0.0.0.0', 'https://kickin.kr','https://www.kickin.co.kr/user/dj-rest-auth/login/']
+
+#ALLOWED_HOSTS=['*']
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',
@@ -66,7 +68,6 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-# Application definition
 
 INSTALLED_APPS = [
     
@@ -77,7 +78,6 @@ INSTALLED_APPS = [
     'reviews',
     'points',
     'productUpdator',
-
     'debug_toolbar',
     'bootstrap5',
     'imagekit',
@@ -115,16 +115,48 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+   "django.middleware.common.CommonMiddleware",
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
+
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+ALLOWED_HOSTS=['www.kickin.co.kr','localhost']
+# CORS_ORIGIN_ALLOW_ALL = True # <- 모든 호스트 허용
+
+# or
+
+CORS_ORIGIN_WHITELIST = (
+    "https://kickin.kr",
+    "https://www.kickin.kr",
+    "http://kickin.co.kr",
+    "http://www.kickin.co.kr",
+)
+
+CORS_ALLOW_METHODS = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+)
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
 
 ROOT_URLCONF = 'cultureSupply.urls'
 
@@ -153,14 +185,15 @@ WSGI_APPLICATION = 'cultureSupply.wsgi.application'
 DATABASES = {
     'default' : {
        'ENGINE': 'django.db.backends.postgresql',
-       'NAME': 'kickin_db' ,
-       'USER': 'postgres' ,
-       'PASSWORD': '1234',
+       'NAME': 'kickindb' ,
+       'USER': 'isaac' ,
+       'PASSWORD': 'ghwn0524@',
        'HOST': 'localhost',
        'PORT': '5432',
     }
 }
 
+<<<<<<< HEAD
 # Redis RAM cache setting
 CACHES = {
     "default": {
@@ -168,10 +201,10 @@ CACHES = {
         "LOCATION": "redis://127.0.0.1:6379/",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+
         }
     }
 }
-
 # DATABASES = {
 #     'default' : {
 #        'ENGINE': 'django.db.backends.postgresql',
@@ -202,7 +235,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 
 
@@ -312,72 +344,6 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-CRONJOBS = [
-    ('* * * * *', 'products.cron.crontab_job')
-]
-
-
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'filters': {
-#         'require_debug_false': {
-#             '()': 'django.utils.log.RequireDebugFalse',
-#         },
-#         'require_debug_true': {
-#             '()': 'django.utils.log.RequireDebugTrue',
-#         },
-#     },
-#     'formatters': {
-#         'django.server': {
-#             '()': 'django.utils.log.ServerFormatter',
-#             'format': '[{server_time}] {message}',
-#             'style': '{',
-#         },
-#         'standard': {
-#             'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-#         },
-#     },
-#     'handlers': {
-#         'console': {
-#             'level': 'INFO',
-#             'filters': ['require_debug_true'],
-#             'class': 'logging.StreamHandler',
-#         },
-#         'django.server': {
-#             'level': 'INFO',  # 수정: DEBUG에서 INFO로 변경
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'django.server',
-#         },
-#         'mail_admins': {
-#             'level': 'ERROR',
-#             'filters': ['require_debug_false'],
-#             'class': 'django.utils.log.AdminEmailHandler'
-#         },
-#         'file': {
-#             'level': 'INFO',  # 수정: DEBUG에서 INFO로 변경
-#             'encoding': 'utf-8',
-#             'filters': ['require_debug_false'],
-#             'class': 'logging.handlers.RotatingFileHandler',
-#             'filename': BASE_DIR / 'logs/mysite.log',
-#             'maxBytes': 1024*1024*5,  # 5 MB
-#             'backupCount': 5,
-#             'formatter': 'standard',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console', 'mail_admins', 'file'],
-#             'level': 'INFO',
-#         },
-#         'django.server': {
-#             'handlers': ['django.server'],
-#             'level': 'INFO',
-#             'propagate': False,
-#         }
-#     }
-# }
-
 
 
 
@@ -396,6 +362,70 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = '[Kickin.kr]'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 10
-# ACCOUNT_EMAIL_CONFIRMATION_EMAIL_SUBJECT = '이메일 인증을 완료해주세요.'
-# ACCOUNT_EMAIL_CONFIRMATION_EMAIL = 'email/confirmation_email.html'
 URL_FRONT = 'https://kickin.kr/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'formatters': {
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[{server_time}] {message}',
+            'style': '{',
+        },
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+        },
+        'django.server': {
+            'level': 'INFO',  # 수정: DEBUG에서 INFO로 변경
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'file': {
+            'level': 'INFO',  # 수정: DEBUG에서 INFO로 변경
+            'encoding': 'utf-8',
+            'filters': ['require_debug_false'],
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs/mysite.log',
+            'maxBytes': 1024*1024*5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'standard',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'mail_admins', 'file'],
+            'level': 'INFO',
+        },
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
+        },
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
+            'propagate': False,
+        }
+    }
+}
+
