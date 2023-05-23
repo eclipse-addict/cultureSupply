@@ -56,6 +56,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8080',
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
@@ -114,7 +120,6 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -155,6 +160,18 @@ DATABASES = {
        'PORT': '5432',
     }
 }
+
+# Redis RAM cache setting
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
 # DATABASES = {
 #     'default' : {
 #        'ENGINE': 'django.db.backends.postgresql',
@@ -187,11 +204,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8080',
-]
 
-CORS_ALLOW_ALL_ORIGINS = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -304,66 +317,66 @@ CRONJOBS = [
 ]
 
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        },
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
-    },
-    'formatters': {
-        'django.server': {
-            '()': 'django.utils.log.ServerFormatter',
-            'format': '[{server_time}] {message}',
-            'style': '{',
-        },
-        'standard': {
-            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
-        },
-        'django.server': {
-            'level': 'INFO',  # 수정: DEBUG에서 INFO로 변경
-            'class': 'logging.StreamHandler',
-            'formatter': 'django.server',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        },
-        'file': {
-            'level': 'INFO',  # 수정: DEBUG에서 INFO로 변경
-            'encoding': 'utf-8',
-            'filters': ['require_debug_false'],
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs/mysite.log',
-            'maxBytes': 1024*1024*5,  # 5 MB
-            'backupCount': 5,
-            'formatter': 'standard',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'mail_admins', 'file'],
-            'level': 'INFO',
-        },
-        'django.server': {
-            'handlers': ['django.server'],
-            'level': 'INFO',
-            'propagate': False,
-        }
-    }
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'filters': {
+#         'require_debug_false': {
+#             '()': 'django.utils.log.RequireDebugFalse',
+#         },
+#         'require_debug_true': {
+#             '()': 'django.utils.log.RequireDebugTrue',
+#         },
+#     },
+#     'formatters': {
+#         'django.server': {
+#             '()': 'django.utils.log.ServerFormatter',
+#             'format': '[{server_time}] {message}',
+#             'style': '{',
+#         },
+#         'standard': {
+#             'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+#         },
+#     },
+#     'handlers': {
+#         'console': {
+#             'level': 'INFO',
+#             'filters': ['require_debug_true'],
+#             'class': 'logging.StreamHandler',
+#         },
+#         'django.server': {
+#             'level': 'INFO',  # 수정: DEBUG에서 INFO로 변경
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'django.server',
+#         },
+#         'mail_admins': {
+#             'level': 'ERROR',
+#             'filters': ['require_debug_false'],
+#             'class': 'django.utils.log.AdminEmailHandler'
+#         },
+#         'file': {
+#             'level': 'INFO',  # 수정: DEBUG에서 INFO로 변경
+#             'encoding': 'utf-8',
+#             'filters': ['require_debug_false'],
+#             'class': 'logging.handlers.RotatingFileHandler',
+#             'filename': BASE_DIR / 'logs/mysite.log',
+#             'maxBytes': 1024*1024*5,  # 5 MB
+#             'backupCount': 5,
+#             'formatter': 'standard',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console', 'mail_admins', 'file'],
+#             'level': 'INFO',
+#         },
+#         'django.server': {
+#             'handlers': ['django.server'],
+#             'level': 'INFO',
+#             'propagate': False,
+#         }
+#     }
+# }
 
 
 
@@ -378,11 +391,11 @@ EMAIL_PORT = 25
 EMAIL_HOST_USER = 'kickin'
 EMAIL_HOST_PASSWORD = EMAIL_PASS
 EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = 'kickin@kickin.kr'
+DEFAULT_FROM_EMAIL = 'admin@kickin.kr'
 ACCOUNT_EMAIL_SUBJECT_PREFIX = '[Kickin.kr]'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 10
-ACCOUNT_EMAIL_CONFIRMATION_EMAIL_SUBJECT = '이메일 인증을 완료해주세요.'
-ACCOUNT_EMAIL_CONFIRMATION_EMAIL = 'email/confirmation_email.html'
+# ACCOUNT_EMAIL_CONFIRMATION_EMAIL_SUBJECT = '이메일 인증을 완료해주세요.'
+# ACCOUNT_EMAIL_CONFIRMATION_EMAIL = 'email/confirmation_email.html'
 URL_FRONT = 'https://kickin.kr/'
