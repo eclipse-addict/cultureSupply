@@ -13,10 +13,11 @@ from rest_framework import status
 from rest_framework import generics
 from rest_framework import filters
 from .serializers import ProductSerializer, RecentReleaseSerializers
-from .models import kicks, productImg
+from .models import kicks, productImg, ProductCrawlingFlag
 from google_images_download import google_images_download
 from assets.brand_list import brand_list
 from django_filters import rest_framework as filters
+from django.core.cache import cache
 from reviews.models import Review
 import re
 import time
@@ -142,7 +143,20 @@ class ProductListViewSet(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         start_time = time.time()
 
+        cache_key = f'product_list_{self.request.query_params}'  # 캐시 키를 사용자별로 고유하게 생성합니다.
+        cached_data = cache.get(cache_key)
+
+        if cached_data is not None:
+
+            print('cache hit')
+            end_time = time.time()
+            execution_time = end_time - start_time
+            print(f"Execution Time with cache: {execution_time} seconds")
+            return Response(cached_data)
+
         response = super().list(request, *args, **kwargs)
+        response.data['request_query_params'] = request.query_params
+        cache.set(cache_key, response.data, timeout=43200)
 
         end_time = time.time()
         execution_time = end_time - start_time
@@ -198,3 +212,17 @@ def product_like(request, product_id, user_id):
     else:
         kick.like_users.add(user)
         return JsonResponse({'message': 'added'}, status=status.HTTP_200_OK)
+
+
+from datetime import datetime
+from pytz import timezone
+
+# 최종 업데이트 일시 가져오기
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_last_updated(request):
+    user_format = '%Y-%m-%d %H:%M:%S'
+    last_updated = ProductCrawlingFlag.objects.get(id=1).created_at
+    formatted_time = last_updated.strftime(user_format)
+
+    return JsonResponse({'last_updated': formatted_time}, status=status.HTTP_200_OK)

@@ -14,6 +14,9 @@ urlpatterns = [
     # data crawling activated request
     path('goat/collections/', crawling_views.goat_collections),  # goat collections 데이터 크롤링 USING
 
+
+    # last data crawling
+    path('last/', views.get_last_updated),
     # Achive request
     # path('sneaker/', views.get_sneaker),
     # path('new/', views.new_release_paser),

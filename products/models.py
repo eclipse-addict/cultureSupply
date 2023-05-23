@@ -5,6 +5,7 @@ from django.conf import settings
 class kicks(models.Model):
     # uuid that stock asigned for this product 
     # it's used to determine whether it's already in stock on the database
+
     uuid = models.CharField(max_length=100, )  # goat
     brand = models.CharField(max_length=100, null=True, blank=True, )
     category = models.CharField(max_length=100, null=True, blank=True, )  # goat
@@ -43,3 +44,7 @@ class productImg(models.Model):
                             blank=False, )  # left(main), right(main_sub), back, top, bottom, additional
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+class ProductCrawlingFlag(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_item_cnt = models.PositiveIntegerField(default=0)
