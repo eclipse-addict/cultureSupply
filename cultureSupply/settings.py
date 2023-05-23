@@ -193,7 +193,7 @@ DATABASES = {
     }
 }
 
-<<<<<<< HEAD
+
 # Redis RAM cache setting
 CACHES = {
     "default": {
