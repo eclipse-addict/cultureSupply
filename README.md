@@ -10,6 +10,19 @@
 > Culture Supply is a web domain which provides users an easy use automatic raffle system. in order to supply most latest raffle infos and chances to win them, domain will have a data crawling feature as well.
 > 
 
+### Local DB docker  Build 
+
+```bash
+docker run -d \
+--name=kickin_db \
+-e POSTGRES_PASSWORD=1234 \
+-e POSTGRES_USER=postgres \
+-e POSTGRES_DB=kickin_db \
+-p 5433:5432 \
+-v /dev:/dev \
+postgres
+```
+
 ###  <br/>
 <div>
 <img src="https://img.shields.io/badge/Django-092E20?style=flat-square&logo=Django&logoColor=white"/>

@@ -7,6 +7,10 @@ from allauth.account.models import EmailConfirmationHMAC
 from allauth.account.utils import send_email_confirmation
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from allauth.account.models import EmailConfirmation, EmailAddress
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 from django.contrib.auth import get_user_model
@@ -38,6 +42,13 @@ class CustomRegisterSerializer(RegisterSerializer):
         send_email_confirmation(request, user, email=user.email)
         return user
 
+    def send_confirmation_email(self):
+        subject = render_to_string('email/confirmation_email_subject.txt')
+        message = render_to_string('email/confirmation_email.html', {'user': self.instance})
+        plain_message = strip_tags(message)
+        recipient_list = [self.instance.email]
+
+        send_mail(subject, plain_message, settings.DEFAULT_FROM_EMAIL, recipient_list, html_message=message)
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

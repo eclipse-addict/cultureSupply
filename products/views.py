@@ -13,13 +13,17 @@ from rest_framework import status
 from rest_framework import generics
 from rest_framework import filters
 from .serializers import ProductSerializer, RecentReleaseSerializers
-from .models import kicks, productImg
+from .models import kicks, productImg, ProductCrawlingFlag
 from google_images_download import google_images_download
 from assets.brand_list import brand_list
 from django_filters import rest_framework as filters
+from django.core.cache import cache
 from reviews.models import Review
 import re
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -49,12 +53,16 @@ class ProductFilter(filters.FilterSet):
             print('Order by Click')
             ProductPagination.ordering = '-click'
 
-        elif value == 'all':
-            print('Order by releaseDate')
+        elif value == 'most_commented':
+            print('Order by most_hyped')
+            queryset = queryset.annotate(review_count=Count('reviews')).order_by('-review_count')
+            ProductPagination.ordering = '-review_count'
+
+        else:
+            print('Order by recent_drop')
             ProductPagination.ordering = '-releaseDate'
 
         return queryset
-
 
     def search_filter(self, queryset, name, value):
         keyword = value.replace('+', ' ')
@@ -96,6 +104,12 @@ class ProductFilter(filters.FilterSet):
 
             q = Q()
 
+            if len(value_list) == 5:
+                print('all condition')
+                q &= (Q(brand__isnull=True) | Q(category='') | (Q(releaseDate__isnull=True) | Q(releaseDate='1900-00-00') | Q(releaseDate='1970-01-01')) | Q(retailPrice__isnull=True) | Q(retailPrice=0) | Q(local_imageUrl__icontains='defaultImg.png'))
+
+                return queryset.filter(q).order_by('-releaseDate')
+
             for value in value_list:
                 if value == 'brand':
                     q &= Q(brand__isnull=True)
@@ -129,10 +143,24 @@ class ProductListViewSet(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         start_time = time.time()
 
+        cache_key = f'product_list_{self.request.query_params}'  # 캐시 키를 사용자별로 고유하게 생성합니다.
+        cached_data = cache.get(cache_key)
+
+        if cached_data is not None:
+
+            print('cache hit')
+            end_time = time.time()
+            execution_time = end_time - start_time
+            print(f"Execution Time with cache: {execution_time} seconds")
+            return Response(cached_data)
+
         response = super().list(request, *args, **kwargs)
+        response.data['request_query_params'] = request.query_params
+        cache.set(cache_key, response.data, timeout=43200)
 
         end_time = time.time()
         execution_time = end_time - start_time
+        logger.info(f"Execution Time: {execution_time} seconds")
         print(f"Execution Time: {execution_time} seconds")
 
         return response
@@ -186,3 +214,15 @@ def product_like(request, product_id, user_id):
         return JsonResponse({'message': 'added'}, status=status.HTTP_200_OK)
 
 
+from datetime import datetime
+from pytz import timezone
+
+# 최종 업데이트 일시 가져오기
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_last_updated(request):
+    user_format = '%Y-%m-%d %H:%M:%S'
+    last_updated = ProductCrawlingFlag.objects.get(id=1).created_at
+    formatted_time = last_updated.strftime(user_format)
+
+    return JsonResponse({'last_updated': formatted_time}, status=status.HTTP_200_OK)

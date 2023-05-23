@@ -39,6 +39,7 @@ SECRET_KEY = get_secret("SECRET_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = get_secret("CLIENT_ID") # 구글 API에서 제공한 Key
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = get_secret("CLIENT_SECURITY_KEY") # 구글 API에서 제공한 Secret key
 EMAIL_PASS = get_secret("EMAIL_PASS")
+
 J_URL_M = get_secret("j_url_m")
 J_URL_F = get_secret("j_url_f")
 N_URL_M = get_secret("n_url_m")
@@ -57,6 +58,9 @@ DEBUG = False
 
 #ALLOWED_HOSTS=['*']
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 
 INSTALLED_APPS = [
@@ -68,7 +72,7 @@ INSTALLED_APPS = [
     'reviews',
     'points',
     'productUpdator',
-
+    'debug_toolbar',
     'bootstrap5',
     'imagekit',
     'django_seed',
@@ -107,6 +111,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',    
    "django.middleware.common.CommonMiddleware",
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -193,11 +198,16 @@ CACHES = {
 }
 
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
+#     'default' : {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'kickindb' ,
+#        'USER': 'isaac' ,
+#        'PASSWORD': 'ghwn0524@',
+#        'HOST': 'localhost',
+#        'PORT': '5432',
 #     }
 # }
+
 
 
 # Password validation
@@ -224,7 +234,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ko-kr'
 
 TIME_ZONE = 'Asia/Seoul'
 
@@ -260,6 +270,7 @@ STATIC_ROOT = os.path.join("staticfiles")
 # roject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+OLD_PASSWORD_FIELD_ENABLED = True
 
 # user model
 AUTH_USER_MODEL = 'accounts.User'
@@ -278,7 +289,7 @@ REST_FRAMEWORK = {
     ),
 }
 
-SITE_ID = 1
+SITE_ID = 2
 LOGIN_REDIRECT_URL = '/sneakers'
 SOCIALACCOUNT_LOGIN_ON_GET=True # redirecting page avoid, and direct to google login 
 
@@ -288,13 +299,14 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=90),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=3),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
@@ -327,9 +339,6 @@ SIMPLE_JWT = {
 
 
 
-REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
-}
 
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
@@ -390,7 +399,7 @@ LOGGING = {
             'encoding': 'utf-8',
             'filters': ['require_debug_false'],
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs/site.log',
+            'filename': BASE_DIR / 'logs/mysite.log',
             'maxBytes': 1024*1024*5,  # 5 MB
             'backupCount': 5,
             'formatter': 'standard',
@@ -399,13 +408,18 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console', 'mail_admins', 'file'],
-            'level': 'DEBUG',
+            'level': 'INFO',
         },
         'django.server': {
             'handlers': ['django.server'],
-            'level': 'DEBUG',
+            'level': 'INFO',
+        },
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
             'propagate': False,
         }
     }
 }
+
 

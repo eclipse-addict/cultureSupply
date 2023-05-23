@@ -1,8 +1,12 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
+from rest_framework import routers
+from .views import PointHistoryViewSet
+
+router = routers.DefaultRouter()
+router.register(r'points', PointHistoryViewSet)
 
 urlpatterns = [
-    
-    # path('new/<int:product_id>/<int:user_id>/', views.create_review), 
-    # path('list/<int:product_id>/', views.get_review_list), 
+    path('', include(router.urls)),
+    path('history/<int:id>', views.get_point_history),
 ]

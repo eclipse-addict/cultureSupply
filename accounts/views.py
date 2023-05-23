@@ -142,16 +142,14 @@ def get_update_create_userinfo(request, user_pk):
 
     # if it's the first time login, and just created a new row in Point table
     if point_row_created:
-        user_point.current_point = 1000
+        user_point.current_points = 1000
         user_point.save()
         create_point_history(1000, user, '회원 가입', 'add')
 
     if request.method == 'GET':
         serializer = UserInfoSerializer(user_info)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
     elif request.method == 'PUT':
-        print(request.data)
         serializer = UserInfoSerializer(user_info, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -160,4 +158,3 @@ def get_update_create_userinfo(request, user_pk):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(status=status.HTTP_400_BAD_REQUEST)
-

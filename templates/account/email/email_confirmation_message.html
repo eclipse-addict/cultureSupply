@@ -1,0 +1,15 @@
+{% load i18n %}
+
+{% blocktrans %}안녕하세요! <strong>KICKIN</strong> 입니다. <br/>{% endblocktrans %}
+{% blocktrans %}저희 서비스를 이용해 주셔서 감사합니다!{% endblocktrans %}
+
+{% blocktrans %}
+이메일 인증을 위해 아래 링크를 클릭해주세요: <br/>
+<a href="{{ activate_url }}">{{ activate_url }}</a>
+    <br/>
+{% endblocktrans %}
+{% blocktrans %}본 인증 링크는 7일 동안 유효 합니다. <br/>
+만약 인증에 실패할 경우, admin@kickin.kr 로 문의 바랍니다. <br/>
+{% endblocktrans %}
+
+{% blocktrans %}감사합니다!{% endblocktrans %}

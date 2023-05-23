@@ -14,3 +14,4 @@ class PointHistory(models.Model):
     point_type = models.CharField(max_length=500, blank=False, null=False)  # charge, use
     point_amount = models.IntegerField(default=0, blank=False, null=False)
     description = models.CharField(max_length=500, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
