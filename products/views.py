@@ -222,7 +222,7 @@ from pytz import timezone
 @permission_classes([AllowAny])
 def get_last_updated(request):
     user_format = '%Y-%m-%d %H:%M:%S'
-    last_updated = ProductCrawlingFlag.objects.get(id=1).created_at
+    last_updated = ProductCrawlingFlag.objects.latest('created_at').created_at
     formatted_time = last_updated.strftime(user_format)
 
     return JsonResponse({'last_updated': formatted_time}, status=status.HTTP_200_OK)
