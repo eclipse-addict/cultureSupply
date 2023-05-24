@@ -15,6 +15,7 @@ urlpatterns = [
     path('goat/collections/', crawling_views.goat_collections),  # goat collections 데이터 크롤링 USING
 
 
+
     # last data crawling
     path('last/', views.get_last_updated),
     # Achive request
@@ -28,5 +29,8 @@ urlpatterns = [
     # path('imgmodel/', views.temp_img_fix),
     # path('imgmodeladd/', views.select_all_and_add_img_model),
     # path('imgupdator/', views.img_url_updator), # 이미지 Url Localhost -> https://www.kickin.co.kr/ 로 변경
-    # path('test/', views.select_all_test),
 ]
+if settings.DEBUG:
+    urlpatterns += [
+    path('dev/crawling/', crawling_views.dev_crawling_test),
+    ]

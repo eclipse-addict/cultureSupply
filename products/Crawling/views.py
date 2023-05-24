@@ -125,7 +125,7 @@ def goat_collections(request):
     last_updated_flag = ProductCrawlingFlag(updated_item_cnt=new_cnt)
     last_updated_flag.save()
 
-    return HttpResponse(content={'new_cnt': new_cnt, 'spent_time': time.time() - start}, status=status.HTTP_201_CREATED)
+    return JsonResponse({'new_product_count': new_cnt, 'time': time.time() - start}, status=status.HTTP_201_CREATED)
 
 
 # 284,361 /200 = // current 21 page
@@ -644,3 +644,9 @@ def img_url_updator(reqeust):
     res.status_code = 200
     
     return res
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def dev_crawling_test(request):
+    print('dev_crawling_test')
+    return JsonResponse({'new_product_count': 100, 'time': "300s"}, status=status.HTTP_200_OK)

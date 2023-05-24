@@ -143,7 +143,8 @@ class ProductListViewSet(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         start_time = time.time()
 
-        cache_key = f'product_list_{self.request.query_params}'  # 캐시 키를 사용자별로 고유하게 생성합니다.
+        cache_key = f'product_list_{self.request.query_params}'
+        print('cache_key', cache_key)
         cached_data = cache.get(cache_key)
 
         if cached_data is not None:
