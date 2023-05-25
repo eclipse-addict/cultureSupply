@@ -35,7 +35,15 @@ class kicks(models.Model):
 
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_users', blank=True)
     click = models.PositiveBigIntegerField(default=0)
-
+    class Meta:
+        indexes = [
+            models.Index(fields=['id', 'brand']),
+            models.Index(fields=['id', 'category']),
+            models.Index(fields=['id', 'name']),
+            models.Index(fields=['id', 'category', 'brand', 'name']),
+            models.Index(fields=['id', 'brand', 'name']),
+            models.Index(fields=['id', 'releaseDate']),
+        ]
 
 class productImg(models.Model):
     product = models.ForeignKey(kicks, on_delete=models.CASCADE, related_name='productImg')
