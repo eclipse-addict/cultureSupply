@@ -157,7 +157,7 @@ class ProductListViewSet(generics.ListAPIView):
 
         response = super().list(request, *args, **kwargs)
         response.data['request_query_params'] = request.query_params
-        cache.set(cache_key, response.data)
+        cache.set(cache_key, response.data, timeout=None)
 
         end_time = time.time()
         execution_time = end_time - start_time
