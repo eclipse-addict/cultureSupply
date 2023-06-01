@@ -1,10 +1,14 @@
 from django.urls import path
 from . import views
-from .views import RaffleViewSet, RaffleEntryViewSet
+from .views import RaffleViewSet
 
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r'', RaffleViewSet)
-router.register(r'raffleEntry', RaffleEntryViewSet)
-urlpatterns = router.urls
+
+urlpatterns = [
+    path('entries/', views.raffle_entry),
+]
+
+urlpatterns += router.urls

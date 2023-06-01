@@ -3,7 +3,7 @@ from .models import Raffle, RaffleEntry
 from products.serializers import ProductSerializer
 
 class RaffleSerializer(serializers.ModelSerializer):
-    product = ProductSerializer()
+    product = ProductSerializer(read_only=True)
     class Meta:
         model = Raffle
         fields = '__all__'
@@ -16,3 +16,4 @@ class RaffleEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = RaffleEntry
         fields = '__all__'
+        read_only_fields = ('raffle',)

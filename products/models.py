@@ -16,6 +16,7 @@ class kicks(models.Model):
     description = models.TextField()
     gender = models.CharField(max_length=10, default='')
     name = models.CharField(max_length=500, )  # goat
+    name_kr = models.CharField(max_length=500, null=True)
     productCategory = models.CharField(max_length=100, )
     releaseDate = models.CharField(max_length=100, null=True, blank=True, default='2022-12-12')  # goat
     release_date_year = models.CharField(max_length=100, null=True, blank=True, )  # goat

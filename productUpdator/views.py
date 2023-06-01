@@ -56,7 +56,7 @@ class UpdatorViewSet(ModelViewSet):
 @permission_classes([IsAuthenticated])
 def create_updator(request):
     updatorItems = []
-    brand, colorway, category, retail, date, local_imageUrl = None, None, None, None, None, None
+    brand, colorway, category, retail, date, local_imageUrl, name_kr = None, None, None, None, None, None, None
 
     # Create a mutable copy of the request data
     data = request.data.copy()
@@ -73,6 +73,8 @@ def create_updator(request):
         date = data.pop('date')
     if data.get('local_imageUrl'):
         local_imageUrl = data.pop('local_imageUrl')
+    if data.get('name_kr'):
+        name_kr = data.pop('name_kr')
 
     print(f'data : {data}')
     serializer = ProductUpdatorSerializer(data=data)
@@ -93,6 +95,8 @@ def create_updator(request):
 
     if brand:
         updatorItems.append(ProductUpdatorItems(product_updator_id=updator, field_name='brand', field_value=brand))
+    if name_kr:
+        updatorItems.append(ProductUpdatorItems(product_updator_id=updator, field_name='name_kr', field_value=name_kr))
     if colorway:
         updatorItems.append(
             ProductUpdatorItems(product_updator_id=updator, field_name='colorway', field_value=colorway))
@@ -132,6 +136,8 @@ def accept_updator(request, pk):
             product.retailPrice = item.field_value.strip("[, ], '")
         elif item.field_name == 'date':
             product.release_date = item.field_value.strip("[, ], '")
+        elif item.field_name == 'name_kr':
+            product.name_kr = item.field_value.strip("[, ], '")
 
     updator_items.update(approved=True)
     product.save()

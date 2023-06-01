@@ -38,10 +38,15 @@ class ProductSerializer(serializers.ModelSerializer):
         model = kicks
         fields = ('reviews', 'like_count', 'review_count', 'id',
                   'brand', 'colorway', 'description', 'category',
-                  'gender', 'name', 'releaseDate', 'retailPrice',
+                  'gender', 'name', 'name_kr', 'releaseDate', 'retailPrice',
                   'click', 'sku', 'local_imageUrl', 'like_users', 'rating_avg',)
 
 
 class RecentReleaseSerializers(ProductSerializer):
     class Meta(ProductSerializer.Meta):
         fields = ('id', 'name', 'local_imageUrl')
+
+
+class SimpleProductSerializer(serializers.ModelSerializer):
+    class Meta(ProductSerializer):
+        fields = ('id', 'name',)

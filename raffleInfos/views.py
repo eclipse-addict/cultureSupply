@@ -1,8 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from rest_framework.decorators import api_view, permission_classes
 from .serializers import RaffleSerializer, RaffleEntrySerializer
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
@@ -13,7 +15,7 @@ User = get_user_model()
 
 
 class RafflePagination(PageNumberPagination):
-    page_size = 10
+    page_size = 3
 
 
 
@@ -28,31 +30,38 @@ class RaffleViewSet(viewsets.ModelViewSet):
         product_id = request.data.get('product')
         product = Product.objects.get(pk=product_id)
         serializer = self.get_serializer( data=request.data)
+
         if serializer.is_valid(raise_exception=True):
+            print('Create Raffle!!!!!!!!!!!!!!!!!!!')
             serializer.save(product=product)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print('Create Raffle Failed!!!!!!!!!!!!!!!!!!!')
+            print(serializer.errors)
 
-        # product 필드에 대한 유효성 검사
-        print(product_id)
-        if not product_id:
-            return Response({'product': ['이 필드는 필수 항목입니다!!!!']}, status=status.HTTP_400_BAD_REQUEST)
-
-        # product_id에 해당하는 Product 객체가 존재하는지 확인하는 추가 로직
+    def retrieve(self, request, pk=None):
+        print('Retrieve Raffle!!!!!!!!!!!!!!!!!!!')
         try:
-            product = Product.objects.get(id=product_id)
-        except Product.DoesNotExist:
-            return Response({'product': ['유효하지 않은 상품입니다.']}, status=status.HTTP_400_BAD_REQUEST)
-
-        # product_id가 유효한 경우 serializer를 저장하고 응답 생성
-        serializer.save(product=product)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            raffle = get_object_or_404(Raffle.objects.filter(product=pk))
+            return JsonResponse(data={'result': '1'}, status=status.HTTP_200_OK)
+        except:
+            return JsonResponse(data={'result': '0'}, status=status.HTTP_200_OK)
 
 
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticatedOrReadOnly])
+def raffle_entry(request):
+    if request.method == 'POST':
+        print('Raffle Entry!!!!!!!!!!!!!!!!!!!')
+        user = request.user
+        raffleEntry = RaffleEntry.objects.filter(user=user, raffle=request.data.get('raffle'))
 
-class RaffleEntryViewSet(viewsets.ModelViewSet):
-    queryset = RaffleEntry.objects.all()
-    serializer_class = RaffleEntrySerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    pagination_class = RafflePagination
+        if raffleEntry:
+            return JsonResponse(data={'message': '이미 응모하신 제품입니다.'}, status=status.HTTP_302_FOUND)
+        else:
+            raffle_id = request.data.get('raffle')
+            raffle = Raffle.objects.get(pk=raffle_id)
+            raffle_entry = RaffleEntry.objects.create(user=user, raffle=raffle)
+            raffle_entry.save()
+            return JsonResponse(data={'result': '응모가 완료되었습니다.'}, status=status.HTTP_201_CREATED)
 
