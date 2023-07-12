@@ -159,25 +159,25 @@ WSGI_APPLICATION = 'cultureSupply.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default' : {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': 'kickin_db' ,
-#        'USER': 'postgres' ,
-#        'PASSWORD': '1234',
-#        'HOST': 'localhost',
-#        'PORT': '5432',
-#     }
-# }
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'kickinDb',
-        'HOST': 'localhost',
-        'PORT': 27017,
+    'default' : {
+       'ENGINE': 'django.db.backends.postgresql',
+       'NAME': 'kickin_db' ,
+       'USER': 'postgres' ,
+       'PASSWORD': '1234',
+       'HOST': 'localhost',
+       'PORT': '5432',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'djongo',
+#         'NAME': 'kickinDb',
+#         'HOST': 'localhost',
+#         'PORT': 27017,
+#     }
+# }
 
 # Redis RAM cache setting
 # CACHES = {
