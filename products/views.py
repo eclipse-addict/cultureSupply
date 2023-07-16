@@ -131,14 +131,40 @@ class ProductFilter(filters.FilterSet):
 
 class ProductListViewSet(generics.ListAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    queryset = kicks.objects.prefetch_related('reviews',
-                                              'like_users').annotate(review_count=Count('reviews'),
-                                                                     like_count=Count('like_users'),
-                                                                     rating_avg=Avg('reviews__rating'))
+    # queryset = kicks.objects.prefetch_related('like_users')
+    # queryset = kicks.objects.prefetch_related('reviews',
+    #                                           'like_users').annotate(review_count=Count('reviews'),
+    #                                                                  like_count=Count('like_users'),
+    #                                                                  rating_avg=Avg('reviews__rating'))
     serializer_class = ProductSerializer
     pagination_class = ProductPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
+
+    def get_queryset(self):
+        queryset = kicks.objects.all()
+
+        name_filter = self.request.query_params.get('name')
+        release_date_start = self.request.query_params.get('release_date_start')
+        release_date_end = self.request.query_params.get('release_date_end')
+
+        if name_filter:
+            queryset = queryset.filter(
+                name__icontains=name_filter
+            )
+
+        if release_date_start and release_date_end:
+            queryset = queryset.filter(
+                releaseDate__range=(release_date_start, release_date_end)
+            )
+
+
+        queryset = queryset.prefetch_related(
+            Prefetch('like_users', queryset=User.objects.only('id'))
+        )
+
+        return queryset
+
 
     def list(self, request, *args, **kwargs):
         start_time = time.time()
