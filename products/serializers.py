@@ -27,20 +27,25 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class ProductSerializer(serializers.ModelSerializer):
-    # reviews = ReviewListSerializer(many=True, read_only=True)
-    # review_count = serializers.IntegerField(read_only=True)
-    # like_count = serializers.IntegerField(read_only=True)
-    # rating_avg = serializers.IntegerField(read_only=True)
+    class Meta:
+        model = kicks
+        fields = '__all__'
+
+
+class ProductDetailSerializer(serializers.ModelSerializer):
+    reviews = ReviewListSerializer(many=True, read_only=True)
+    review_count = serializers.IntegerField(read_only=True)
+    like_count = serializers.IntegerField(read_only=True)
+    rating_avg = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = kicks
         fields = '__all__'
-        # fields = ('reviews', 'like_count', 'review_count', 'id',
-        #           'brand', 'colorway', 'description', 'category',
-        #           'gender', 'name', 'name_kr', 'releaseDate', 'retailPrice',
-        #           'click', 'sku', 'local_imageUrl', 'like_users', 'rating_avg',)
+        fields = ('reviews', 'like_count', 'review_count', 'id',
+                  'brand', 'colorway', 'description', 'category',
+                  'gender', 'name', 'name_kr', 'releaseDate', 'retailPrice',
+                  'click', 'sku', 'local_imageUrl', 'like_users', 'rating_avg',)
 
 
 class RecentReleaseSerializers(ProductSerializer):

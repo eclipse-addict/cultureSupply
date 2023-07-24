@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     'reviews',
     'points',
     'productUpdator',
+    'releaseInfos',
 
     'debug_toolbar',
     'bootstrap5',

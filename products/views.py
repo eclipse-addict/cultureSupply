@@ -12,7 +12,7 @@ from rest_framework.pagination import PageNumberPagination, CursorPagination
 from rest_framework import status
 from rest_framework import generics
 from rest_framework import filters
-from .serializers import ProductSerializer, RecentReleaseSerializers
+from .serializers import ProductSerializer, RecentReleaseSerializers, ProductDetailSerializer
 from .models import kicks, productImg, ProductCrawlingFlag
 from google_images_download import google_images_download
 from assets.brand_list import brand_list
@@ -22,6 +22,7 @@ from reviews.models import Review
 import re
 import time
 import logging
+from datetime import timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -196,22 +197,6 @@ class ProductListViewSet(generics.ListAPIView):
 '''
 for main page component
 '''
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def recent_releases(request):
-    if request.method == 'GET':
-        product_list = kicks.objects.exclude(
-            local_imageUrl='media/images/defaultImg.png'
-        ).exclude(releaseDate__isnull=True).order_by('-releaseDate')[:15]
-
-        serializer = RecentReleaseSerializers(product_list, many=True)
-        return Response(serializer.data)
-    else:
-        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_detail(request, prd_id):
@@ -223,7 +208,7 @@ def get_detail(request, prd_id):
     # 조회수 증가
     kick.click += 1
     kick.save()
-    serializer = ProductSerializer(kick)
+    serializer = ProductDetailSerializer(kick)
     return Response(serializer.data)
 
 
@@ -253,3 +238,16 @@ def get_last_updated(request):
     formatted_time = last_updated.strftime(user_format)
 
     return JsonResponse({'last_updated': formatted_time}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def recent_releases(request):
+    # get latest 10 products
+    # release_date_start is 10 days ago
+    # release_date_end is today
+    release_date_end = datetime.now(timezone('Asia/Seoul'))
+    release_date_start = release_date_end - timedelta(days=30)
+    latest_products = kicks.objects.filter(releaseDate__range=(release_date_start, release_date_end)).order_by('-releaseDate')[:12]
+    serializer = ProductSerializer(latest_products, many=True)
+    return Response(serializer.data)
