@@ -246,8 +246,8 @@ def recent_releases(request):
     # get latest 10 products
     # release_date_start is 10 days ago
     # release_date_end is today
-    release_date_end = datetime.now(timezone('Asia/Seoul'))
-    release_date_start = release_date_end - timedelta(days=30)
+    release_date_end = datetime.now(timezone('Asia/Seoul')) + timedelta(days=7)
+    release_date_start = release_date_end - timedelta(days=7)
     latest_products = kicks.objects.filter(releaseDate__range=(release_date_start, release_date_end)).order_by('-releaseDate')[:12]
     serializer = ProductSerializer(latest_products, many=True)
     return Response(serializer.data)
