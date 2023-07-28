@@ -13,6 +13,7 @@ urlpatterns = [
 
     # data crawling activated request
     path('goat/collections/', crawling_views.goat_collections),  # goat collections 데이터 크롤링 USING
+    path('kream/', crawling_views.kream_crawling),  # Kream 데이터 크롤링 USING
 
 
 
@@ -32,5 +33,5 @@ urlpatterns = [
 ]
 if settings.DEBUG:
     urlpatterns += [
-    path('dev/crawling/', crawling_views.dev_crawling_test),
+    # path('dev/crawling/', crawling_views.dev_crawling_test),
     ]
