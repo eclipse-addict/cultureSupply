@@ -722,29 +722,49 @@ def kream_crawling(request):
         "X-Kream-Client-Datetime": "20230726231317+0900",
         "X-Kream-Device-Id": "web;a15eb7e5-0713-4cf8-a253-94cc20a9faae"
     }
-    products = kicks.objects.filter(Q(local_imageUrl__icontains='media/images/defaultImg.png')|
-                                    Q(name_kr='')|Q(name_kr__isnull=True)| Q(brand='')|Q(brand__isnull=True)|
-                                    Q(category='')|Q(category__isnull=True))
-
+    # products = kicks.objects.filter(Q(local_imageUrl__icontains='media/images/defaultImg.png')|
+    #                                 Q(name_kr='')|Q(name_kr__isnull=True)| Q(brand='')|Q(brand__isnull=True)|
+    #                                 Q(category='')|Q(category__isnull=True))
+    products = kicks.objects.all()
     print('products size : ', len(products))
 
     for p in products:
-        print('for iteration started')
         url = f'https://kream.co.kr/api/p/tabs/all/?keyword={p.sku}&request_key=1175edd6-81b3-4bce-8568-664d0c574152'
         response = requests.get(url, headers=headers).json()
+
         if response.get("items"):
             print('response is not null')
-            category = response.get("items")[0].get('product').get("release").get("category")
-            translated_name = response.get("items")[0].get('product').get("release").get("translated_name")
-            original_price = response.get("items")[0].get('product').get("release").get("original_price")
-            colorway = response.get("items")[0].get('product').get("release").get("colorway")
-            brand = response.get("items")[0].get('product').get('brand').get('name')
 
-            p.retailPrice = original_price
-            p.category = category
-            p.name_kr = translated_name
-            p.colorway = colorway
-            p.brand = brand
+            if not p.name_kr:
+                print('name_kr is null')
+                translated_name = response.get("items")[0].get('product').get("release").get("translated_name")
+                p.name_kr = translated_name
+                print(f'name_kr updated : {p.name_kr}')
+
+            if not p.brand:
+                print('brand is null')
+                brand = response.get("items")[0].get('product').get('brand').get('name')
+                p.brand = brand
+                print(f'brand updated : {p.brand}')
+
+            if not p.category:
+                print('category is null')
+                category = response.get("items")[0].get('product').get("release").get("category")
+                p.category = category
+                print(f'category updated : {p.category}')
+
+            local_price_currency = response.get("items")[0].get('product').get("release").get("local_price_currency")
+            original_price = response.get("items")[0].get('product').get("release").get("original_price")
+
+            if local_price_currency == 'KRW' and original_price:
+                p.retailPriceKrw = original_price
+                print(f'retailPriceKrw updated : {p.retailPriceKrw}')
+            colorway = response.get("items")[0].get('product').get("release").get("colorway")
+
+            if not p.colorway:
+                print('colorway is null')
+                p.colorway = colorway
+                print(f'colorway updated : {p.colorway}')
             p.save()
             print(f'saved_p : {p.name_kr}')
 
