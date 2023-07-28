@@ -704,6 +704,7 @@ def img_url_updator(reqeust):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def kream_crawling(request):
+    print('kream_crawling start')
     headers = {
         "Accept": "application/json, text/plain, */*",
         "Accept-Encoding": "gzip, deflate, br",
@@ -724,11 +725,15 @@ def kream_crawling(request):
     products = kicks.objects.filter(Q(local_imageUrl__icontains='media/images/defaultImg.png')|
                                     Q(name_kr='')|Q(name_kr__isnull=True)| Q(brand='')|Q(brand__isnull=True)|
                                     Q(category='')|Q(category__isnull=True))
+
+    print('products size : ', len(products))
+
     for p in products:
+        print('for iteration started')
         url = f'https://kream.co.kr/api/p/tabs/all/?keyword={p.sku}&request_key=1175edd6-81b3-4bce-8568-664d0c574152'
         response = requests.get(url, headers=headers).json()
         if response.get("items"):
-            # print('res: ', response.get("items"))
+            print('response is not null')
             category = response.get("items")[0].get('product').get("release").get("category")
             translated_name = response.get("items")[0].get('product').get("release").get("translated_name")
             original_price = response.get("items")[0].get('product').get("release").get("original_price")
