@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import PageNumberPagination, CursorPagination
+from django.utils.dateparse import parse_date
 from rest_framework import status
 from rest_framework import generics
 from rest_framework import filters
@@ -65,6 +66,18 @@ class ProductFilter(filters.FilterSet):
 
         return queryset
 
+    # def search_filter(self, queryset, name, value):
+    #     keyword = value.replace('+', ' ')
+    #     keyword_regex = re.sub(r'\s+', r'\\s*', keyword)
+    #
+    #     # Add space between the letters in the keyword if they are not already separated by space
+    #     keyword_with_space = re.sub(r'(?<=\D)(?=\d)|(?<=\d)(?=\D)', ' ', keyword)
+    #
+    #     return queryset.filter(
+    #         Q(name__icontains=keyword) |
+    #         Q(name__iregex=fr'{keyword_regex}') |
+    #         Q(name__icontains=keyword_with_space))
+
     def search_filter(self, queryset, name, value):
         keyword = value.replace('+', ' ')
         keyword_regex = re.sub(r'\s+', r'\\s*', keyword)
@@ -72,10 +85,13 @@ class ProductFilter(filters.FilterSet):
         # Add space between the letters in the keyword if they are not already separated by space
         keyword_with_space = re.sub(r'(?<=\D)(?=\d)|(?<=\d)(?=\D)', ' ', keyword)
 
-        return queryset.filter(
-            Q(name__icontains=keyword) |
-            Q(name__iregex=fr'{keyword_regex}') |
-            Q(name__icontains=keyword_with_space))
+        # Use Q objects to search in both 'name' and 'name_kr' fields
+        name_query = Q(name__iexact=keyword) | Q(name__iregex=fr'{keyword_regex}') | Q(name__iexact=keyword_with_space)
+        name_kr_query = Q(name_kr__iexact=keyword) | Q(name_kr__iregex=fr'{keyword_regex}') | Q(
+            name_kr__iexact=keyword_with_space)
+
+        # Combine both queries with OR condition to get results from both fields
+        return queryset.filter(name_query | name_kr_query)
 
     def brand_filter(self, queryset, name, value):
         brand_list = value.split(',')
@@ -93,11 +109,29 @@ class ProductFilter(filters.FilterSet):
         else:
             date_range = value.split(',')
             if len(date_range) == 1:
-                start_date = end_date = date_range[0]
+                start_date = end_date = datetime.strptime(date_range[0], '%Y-%m-%d')
             else:
-                start_date = date_range[0]
-                end_date = date_range[1]
-        return queryset.filter(releaseDate__range=[start_date, end_date])
+                start_date = datetime.strptime(date_range[0], '%Y-%m-%d')
+                end_date = datetime.strptime(date_range[1], '%Y-%m-%d')
+
+            if not start_date or not end_date:
+                return queryset.none()
+
+            # 종료 날짜를 해당 날짜의 모든 레코드를 포함하도록 조정합니다.
+            end_date = end_date + timedelta(days=1)
+
+            return queryset.filter(releaseDate__gte=start_date, releaseDate__lt=end_date)
+    # def release_date_filter(self, queryset, name, value):
+    #     if not value:
+    #         return queryset.order_by('-releaseDate')
+    #     else:
+    #         date_range = value.split(',')
+    #         if len(date_range) == 1:
+    #             start_date = end_date = date_range[0]
+    #         else:
+    #             start_date = date_range[0]
+    #             end_date = date_range[1]
+    #     return queryset.filter(releaseDate__range=[start_date, end_date])
 
     def info_registrequired_filter(self, queryset, name, value):
         if value:
