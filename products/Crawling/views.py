@@ -164,6 +164,7 @@ def get_goat(request):
 
 
 def get_info_from_sku(prd_sku):
+    print('prd_sku: ', prd_sku, '검색 시작')
     kream_headers = {
         "Authority": "kream.co.kr",
         "Method": "GET",
@@ -193,18 +194,28 @@ def get_info_from_sku(prd_sku):
     # print('res: ', response.status_code)
     # print('res: ', response.text)
     if response.get("items"):
+        retailPriceKrw = 0
         category = response.get("items")[0].get('product').get("release").get("category")
         translated_name = response.get("items")[0].get('product').get("release").get("translated_name")
-        original_price = response.get("items")[0].get('product').get("release").get("original_price")
         colorway = response.get("items")[0].get('product').get("release").get("colorway")
         brand = response.get("items")[0].get('product').get('brand').get('name')
+        released_data = response.get("items")[0].get('product').get("release").get("date_released")
+        image_url = response.get("items")[0].get('product').get("release").get("image_urls")[0]  # error
+        gender = response.get("items")[0].get('product').get("release").get("gender")
+        currency = response.get("items")[0].get('product').get("release").get("original_price_currency")
+
+        if currency == 'KRW':
+            retailPriceKrw = response.get("items")[0].get('product').get("release").get("original_price")
 
         result = {
             'category': category,
             'translated_name': translated_name,
-            'original_price': original_price,
             'colorway': colorway,
-            'brand': brand
+            'brand': brand,
+            'released_data': released_data,
+            'image_url': image_url,
+            'gender': gender,
+            'retailPriceKrw': retailPriceKrw,
         }
         return result
     return None
@@ -225,78 +236,61 @@ def create_new_kick_data(products_list, p, brand):
             print('Already exists')  # 있으면 .
 
             result = 0
-
-            # if not kick.brand:
-            #     print(f'product brand updated : {kick.name}')
-            #     kick.brand = brand
-            #     result =1
-
-            if not kick.releaseDate:
-                if not products_list[p]['data'].get('release_date'):
-                    print(f'No release date found for {products_list[p].get("name")}')
-                else:
-                    date_format = '%Y%m%d'
-                    release_Date = products_list[p]['data'].get('release_date'),
-                    release_Date = str(release_Date).strip('()').strip(',')
-
-                    # if releaseDate is not null format the date to YYYY-MM-DD
-                    release_Date = datetime.datetime.strptime(release_Date, date_format)
-                    release_Date = str(release_Date.date())
-
-                    kick.releaseDate = release_Date
+            sku_result = get_info_from_sku(new_sku)
+            if sku_result:
+                print('기존 제품 sku 를 통해 kream 에서 정보 가져오기 성공.')
+                if not kick.category:
+                    kick.category = sku_result.get('category')
                     result = 1
 
-            elif kick.releaseDate.find('-') == -1:
-                print(f'product releaseDate format updated : {kick.name}')
-                if not products_list[p]['data'].get('release_date'):
-                    print(f'No release date found for {products_list[p].get("name")}')
-                else:
-                    date_format = '%Y%m%d'
-                    release_Date = products_list[p]['data'].get('release_date')
-                    release_Date = str(release_Date).strip('()').strip(',')
-                    # if releaseDate is not null format the date to YYYY-MM-DD
-                    release_Date = datetime.datetime.strptime(str(release_Date), date_format)
-                    release_Date = str(release_Date.date())
-
-                    kick.releaseDate = release_Date
+                if not kick.name_kr:
+                    kick.name = sku_result.get('translated_name')
                     result = 1
 
-            elif kick.releaseDate == '1900-00-00':
-                if not products_list[p]['data'].get('release_date'):
-                    print(f'No release date found for {products_list[p].get("name")}')
-                else:
-                    date_format = '%Y%m%d'
-                    release_Date = products_list[p]['data'].get('release_date'),
-                    # if releaseDate is not null format the date to YYYY-MM-DD
-                    release_Date = str(release_Date).strip('()').strip(',')
-                    release_Date = datetime.datetime.strptime(str(release_Date), date_format)
-                    release_Date = str(release_Date.date())
-
-                    kick.releaseDate = release_Date
+                if not kick.retailPrice:
+                    kick.retailPrice = sku_result.get('original_price')
                     result = 1
 
-            if not kick.category:
-                if products_list[p]['data'].get('category'):
-                    print(f'product category updated : {kick.name}')
-                    kick.category = products_list[p]['data'].get('category')
+                if not kick.colorway:
+                    kick.colorway = sku_result.get('colorway')
                     result = 1
 
-            if not kick.product_type:
-                if products_list[p]['data'].get('product_type'):
-                    print(f'product product_type updated : {kick.name}')
-                    kick.product_type = products_list[p]['data'].get('product_type')
+                if not kick.brand:
+                    kick.brand = sku_result.get('brand')
                     result = 1
 
-            if not kick.retailPrice:
-                if products_list[p]['data'].get('retail_price'):
-                    print(f'product retailPrice updated : {kick.name}')
-                    kick.retailPrice = products_list[p]['data'].get('retail_price')
+                if not kick.retailPriceKrw:
+                    kick.retailPriceKrw = sku_result.get('retailPriceKrw')
                     result = 1
 
-            if not kick.imageUrl:
-                if products_list[p]['data'].get('image_url'):
-                    print(f'product image_url updated : {kick.name}')
-                    kick.imageUrl = products_list[p]['data'].get('image_url')
+                if not kick.releaseDate:
+                    if sku_result.get('released_data'):  # kream 에서 가져온 출시일이 있으면
+                        #   change format of data  from '2023-07-29T00:00:00Z' to '2023-07-29'
+                        kream_date = '2023-07-29T00:00:00Z'  # Example input date, replace this with the actual kream date
+                        kream_date = datetime.strptime(kream_date, '%Y-%m-%dT%H:%M:%SZ')  # Parse the input date string
+                        formatted_kream_date = kream_date.strftime('%Y-%m-%d')  # Format the date to YYYY-MM-DD
+                        release_Date = formatted_kream_date  # Assign the formatted date to releaseDate
+
+                if kick.local_imageUrl == 'media/images/defaultImg.png' and sku_result.get('image_url'):
+                    imageUrl = sku_result.get('image_url')
+
+                    file_name = os.path.basename(imageUrl)
+                    path = urlparse(imageUrl).path
+                    path_url = path[:path.find(file_name)]
+
+                    try:
+                        # /var/services/web/kickin/media/images/sneakers/ -> server_path
+                        # /Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/ -> local_path
+                        req.urlretrieve(imageUrl,
+                                        '/var/services/web/kickin/media/images/sneakers/' + file_name)  # 경로에 해당 제품 이미지 저장
+                        # 해당 제품 db 업데이트
+                        img_url = 'media/images/sneakers/' + file_name  # db에 저장할 경로
+                        kick.local_imageUrl = img_url
+                        result = 1
+                    except:  # 이미지 다운로드 실패시
+                        print(f'!!!이미지 다운로드 Error occured!!!')
+                if not kick.gender:
+                    kick.gender = sku_result.get('gender')
                     result = 1
 
             if result > 0:  # 변경사항이 있으면 저장
@@ -312,20 +306,31 @@ def create_new_kick_data(products_list, p, brand):
         date_format = '%Y%m%d'  # date format
         kream_result = get_info_from_sku(new_sku)  # sku로 제품 정보 가져오기
         print(f'kream_result: {kream_result}')
-        kream_category, kream_translated_name, kream_original_price, kream_colorway, kream_brand = None, None, None, None, None
+        kream_category, kream_translated_name, kream_retailPriceKrw, kream_colorway, kream_brand, kream_released_data, kream_image_url, kream_gender = None, None, None, None, None, None, None, None
         if kream_result:  # 제품 정보가 있으면
+            print('신규 제품 kream 에서 정보 가져오기 성공.')
             kream_category = kream_result.get('category')  # 카테고리
             kream_translated_name = kream_result.get('translated_name')  # 한글 제품명
-            kream_original_price = kream_result.get('original_price')  # 정가
+            kream_retailPriceKrw = kream_result.get('retailPriceKrw')  # 정가
             kream_colorway = kream_result.get('colorway')  # 컬러웨이
             kream_brand = kream_result.get('brand')  # 브랜드
+            released_data = kream_result.get('released_data')  # 출시일
+            image_url = kream_result.get('image_url')  # 이미지 url
+            gender = kream_result.get('gender')  # 성별
 
-        release_Date = products_list[p]['data'].get('release_date')  #
+        release_Date = products_list[p]['data'].get('release_date')
         # if releaseDate is not null format the date to YYYY-MM-DD
         if release_Date:  # releaseDate 가 null 이 아니면
             release_Date = str(release_Date).strip('()').strip(',')  # () , 제거
             release_Date = datetime.datetime.strptime(str(release_Date), date_format)  # date format 변경
             release_Date = str(release_Date.date())
+        elif kream_released_data:  # kream 에서 가져온 출시일이 있으면
+            #   change format of data  from '2023-07-29T00:00:00Z' to '2023-07-29'
+            kream_date = '2023-07-29T00:00:00Z'  # Example input date, replace this with the actual kream date
+            kream_date = datetime.strptime(kream_date, '%Y-%m-%dT%H:%M:%SZ')  # Parse the input date string
+            formatted_kream_date = kream_date.strftime('%Y-%m-%d')  # Format the date to YYYY-MM-DD
+            release_Date = formatted_kream_date  # Assign the formatted date to releaseDate
+
 
         kick = kicks(
             uuid=products_list[p]['data'].get('id'),
@@ -337,11 +342,12 @@ def create_new_kick_data(products_list, p, brand):
             colorway=kream_colorway if kream_colorway else products_list[p]['data'].get('color'),
             releaseDate=release_Date,
             release_date_year=products_list[p]['data'].get('release_date_year'),
-            retailPrice=kream_original_price if kream_original_price else products_list[p]['data'].get('retail_price_cents'),
-            retailPriceKrw=products_list[p]['data'].get('retail_price_cents_krw'),
+            retailPrice=products_list[p]['data'].get('retail_price_cents'),
+            retailPriceKrw=kream_retailPriceKrw,
             sku=new_sku,
             imageUrl=products_list[p]['data'].get('image_url'),
-            slug=products_list[p]['data'].get('slug')
+            slug=products_list[p]['data'].get('slug'),
+            gender=kream_gender if kream_gender else ''
         )
         kick.save()
 
@@ -368,38 +374,26 @@ def create_new_kick_data(products_list, p, brand):
 
             except:  # 이미지 다운로드 실패시
                 print(f'Error occured')
-                kick.imageUrl = 'media/images/defaultImg.png'  # 기본 이미지로 저장
-                kick.save()  # db에 저장
+                if kream_image_url:
+                    print(f'URL Check(kream_image_url):{kick.imageUrl}')
+                    kick.imageUrl = kream_image_url
+                    file_name = os.path.basename(imageUrl)
+                    path = urlparse(imageUrl).path
+                    path_url = path[:path.find(file_name)]
+                    try:
+                        # /var/services/web/kickin/media/images/sneakers/ -> server_path
+                        # /Users/isaac/Desktop/Project/culturesupply/media/images/sneakers/ -> local_path
+                        req.urlretrieve(imageUrl,
+                                        '/var/services/web/kickin/media/images/sneakers/' + file_name)  # 경로에 해당 제품 이미지 저장
+                        # 해당 제품 db 업데이트
+                        img_url = 'media/images/sneakers/' + file_name  # db에 저장할 경로
+                        kick.local_imageUrl = img_url  # db에 저장할 경로 담아놓고
+                        kick.save()  # db에 저장
 
-        img_type_list = ['right', 'left', 'back', 'top', 'bottom', 'additional']  # 이미지 타입 리스트 
+                    except:  # 이미지 다운로드 실패시
 
-        if kick.local_imageUrl != 'media/images/defaultImg.png':  # 기존 이미지가 존재 하는 경우
-            img = productImg(
-                product=kick,
-                img_url=kick.local_imageUrl,
-                type='right'  # right 이미지만 제품 이미지로 저장
-            )
-            img.save()
-
-            for type in img_type_list:
-                if type == 'right':  # right 이미지는 이미 저장했으므로
-                    continue  # 다음 타입으로 넘어감
-
-                img = productImg(  # left, back, top, bottom, additional 이미지 저장
-                    product=kick,
-                    img_url='media/images/defaultImg.png',
-                    type=type
-                )
-                img.save()  # db에 저장
-
-        else:  # 기본 이미지 없는 경우 타입 리스트 순회하며, 기본 이미지 저장
-            for type in img_type_list:  # left, back, top, bottom, additional 이미지 저장
-                img = productImg(  #
-                    product=kick,
-                    img_url='media/images/defaultImg.png',
-                    type=type
-                )
-                img.save()  # db에 저장
+                        kick.imageUrl = 'media/images/defaultImg.png'  # 기본 이미지로 저장
+                        kick.save()  # db에 저장
 
         return 1  # 신제품 등록 처리 완료
 
