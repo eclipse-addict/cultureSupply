@@ -285,3 +285,23 @@ def recent_releases(request):
     latest_products = kicks.objects.filter(releaseDate__range=(release_date_start, release_date_end)).order_by('-releaseDate')[:12]
     serializer = ProductSerializer(latest_products, many=True)
     return Response(serializer.data)
+
+
+class like_list_pagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = None
+    max_page_size = 5
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_likes(request, user_pk):
+    user = User.objects.get(pk=user_pk)
+    likes = kicks.objects.filter(like_users=user)
+
+    # Apply pagination
+    paginator = like_list_pagination()
+    paginated_likes = paginator.paginate_queryset(likes, request)
+
+    serializer = ProductSerializer(paginated_likes, many=True)
+    return paginator.get_paginated_response(serializer.data)

@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     'points',
     'productUpdator',
     'releaseInfos',
+    'api',
 
     'debug_toolbar',
     'bootstrap5',
@@ -105,7 +106,8 @@ INSTALLED_APPS = [
 
     # provider
     'allauth.socialaccount.providers.google',
-
+    'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.naver',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -149,17 +151,25 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
+
             ],
         },
     },
 ]
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
 
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 WSGI_APPLICATION = 'cultureSupply.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
+# psql -U postgres -d kickin_db -f dump_file.sql
 DATABASES = {
     'default' : {
        'ENGINE': 'django.db.backends.postgresql',
@@ -283,9 +293,12 @@ REST_FRAMEWORK = {
     ),
 }
 
-SITE_ID = 2
-LOGIN_REDIRECT_URL = '/sneakers'
-SOCIALACCOUNT_LOGIN_ON_GET=True # redirecting page avoid, and direct to google login
+SITE_ID = 3
+# LOGIN_REDIRECT_URL = '/sneakers'
+# SOCIALACCOUNT_LOGIN_ON_GET = True
+# LOGIN_REDIRECT_URL = 'main'
+# ACCOUNT_LOGOUT_REDIRECT_URL = 'index'
+# ACCOUNT_LOGOUT_ON_GET = True
 
 REST_USE_JWT = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
@@ -397,7 +410,17 @@ CRONJOBS = [
 #     }
 # }
 
-
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
 
 
 REST_AUTH_REGISTER_SERIALIZERS = {

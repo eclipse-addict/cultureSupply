@@ -10,6 +10,7 @@ urlpatterns = [
     path('sneaker/like/<int:product_id>/<int:user_id>/', views.product_like),
     path('sneaker/list/', ProductListViewSet.as_view()),
     path('sneaker/recent/', views.recent_releases),
+    path('sneaker/likes/<int:user_pk>/', views.get_likes),
 
     # data crawling activated request
     path('goat/collections/', crawling_views.goat_collections),  # goat collections 데이터 크롤링 USING

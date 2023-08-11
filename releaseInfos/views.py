@@ -65,12 +65,10 @@ def get_ongoing_release_detail(request, prd_sku):
         print(f'release_data : {release_data}')
         serializer = ReleaseInfoSerializer(release_data, many=True)
         json_data = json.dumps(serializer.data, ensure_ascii=False)
-    return JsonResponse(data=serializer.data, status=status.HTTP_200_OK, safe=False)
+        return JsonResponse(data=serializer.data, status=status.HTTP_200_OK, safe=False)
+    return JsonResponse(data={'result': 'no data'}, status=status.HTTP_200_OK)
 
-
-def get_kream_price_Info(reqeust, prd_sku):
-    url = f'https://kream.co.kr/api/p/tabs/all/?keyword={prd_sku}&request_key=1175edd6-81b3-4bce-8568-664d0c574152'
-    headers = {
+headers = {
         "Authority": "kream.co.kr",
         "Method": "GET",
         "Path": "/api/p/tabs/all/?keyword=CZ0790-106&request_key=1175edd6-81b3-4bce-8568-664d0c574152",
@@ -91,6 +89,10 @@ def get_kream_price_Info(reqeust, prd_sku):
         "X-Kream-Client-Datetime": "20230722111114+0900",
         "X-Kream-Device-Id": "web;a15eb7e5-0713-4cf8-a253-94cc20a9faae"
     }
+
+def get_kream_price_Info(reqeust, prd_sku):
+    url = f'https://kream.co.kr/api/p/tabs/all/?keyword={prd_sku}&request_key=1175edd6-81b3-4bce-8568-664d0c574152'
+
     response = requests.get(url, headers=headers).json()
     if response.get("items"):
         original_price = response.get("items")[0].get('product').get("release").get("original_price")
@@ -103,6 +105,30 @@ def get_kream_price_Info(reqeust, prd_sku):
             'market_price': market_price,
             'price_premium': price_premium,
             'pricepremium_percentage': pricepremium_percentage
+        }
+        return JsonResponse(data={'result': result}, status=status.HTTP_200_OK)
+    return JsonResponse(data={'result': 'no data'}, status=status.HTTP_200_OK)
+
+
+def sku_search(reqeust, prd_sku):
+    url = f'https://kream.co.kr/api/p/tabs/all/?keyword={prd_sku}&request_key=1175edd6-81b3-4bce-8568-664d0c574152'
+
+    response = requests.get(url, headers=headers).json()
+    if response.get("items"):
+        print(response.get("items"))
+        category = response.get("items")[0].get('product').get("release").get("category")
+        translated_name = response.get("items")[0].get('product').get("release").get("translated_name")
+        original_price = response.get("items")[0].get('product').get("release").get("original_price")
+        colorway = response.get("items")[0].get('product').get("release").get("colorway")
+        brand = response.get("items")[0].get('product').get('brand').get('name')
+
+
+        result = {
+            'category': category,
+            'translated_name': translated_name,
+            'original_price': original_price,
+            'colorway': colorway,
+            'brand': brand
         }
         return JsonResponse(data={'result': result}, status=status.HTTP_200_OK)
     return JsonResponse(data={'result': 'no data'}, status=status.HTTP_200_OK)

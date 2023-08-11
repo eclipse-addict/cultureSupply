@@ -5,6 +5,8 @@ from django.utils import timezone
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailConfirmationHMAC
 from allauth.account.utils import send_email_confirmation
+from dj_rest_auth.serializers import TokenSerializer
+from django.contrib.auth import get_user_model
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from allauth.account.models import EmailConfirmation, EmailAddress
 from django.template.loader import render_to_string
@@ -84,5 +86,8 @@ class UserPointHistorySerializer(serializers.ModelSerializer):
         model = PointHistory
         fields = '__all__'
         read_only_fields = ('user',)
+
+
+# serializers.py
 
 

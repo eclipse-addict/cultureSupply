@@ -30,7 +30,7 @@ from points.models import Point
 User = get_user_model()
 
 
-@api_view(['GET',])
+@api_view(['GET'])
 @permission_classes([AllowAny])
 def nick_name_check(request):
     nickCheck = UserInfo.objects.filter(nick_name=request.GET.get('nick_name'))
@@ -158,3 +158,4 @@ def get_update_create_userinfo(request, user_pk):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
