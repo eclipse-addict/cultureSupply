@@ -49,15 +49,7 @@ def kakao_login_and_get_userinfo(request):
     pp(info_res)
 
     nickname = info_res.get('properties').get('nickname')
-    # 카카오 로그인의 경우, 이메일이 없을 수 있다.
-    try:
-        email = info_res.get('kakao_account')  # 에러 발생 지점.
-    except:
-
-        # 이메일이 없는 경우, 임의의 이메일을 생성한다.
-        characters = string.ascii_letters + string.digits  # 알파벳 대/소문자와 숫자
-        random_string = ''.join(random.choice(characters) for _ in range(5))
-        email = f'{nickname + random_string}@kakao.com'
+    email = info_res.get('kakao_account').get('email')
 
 
     # 해당 이메일을 사용해 가입한 이력이 있는지, 확인한다.
