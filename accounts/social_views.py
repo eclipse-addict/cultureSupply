@@ -1,33 +1,17 @@
-import jwt
-from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.authtoken.models import Token
-import requests
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from .serializers import *
+import random
+import string
 from pprint import pprint as pp
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
-from rest_framework import status, viewsets, response
-from rest_framework.permissions import IsAuthenticated
+
+import requests
+from allauth.account.models import EmailAddress
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from django.contrib.auth import authenticate
-from django.shortcuts import render, get_object_or_404
-from cultureSupply.settings import SECRET_KEY
-from points.views import new_user_point, create_point_history
-from allauth.account.models import EmailConfirmation, EmailAddress
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from dj_rest_auth.registration.views import ConfirmEmailView
-from django.urls import reverse_lazy
-from django.views.generic import View
-from django.shortcuts import redirect
-from django.template.loader import render_to_string
-from django.core.mail import send_mail
-from django.conf import settings
-from points.models import Point
+
+from points.views import new_user_point
+from .serializers import *
 
 User = get_user_model()
 
@@ -64,9 +48,19 @@ def kakao_login_and_get_userinfo(request):
 
     pp(info_res)
 
-    # 해당 이메일을 사용해 가입한 이력이 있는지, 확인한다.
-    email = info_res.get('kakao_account').get('email')
     nickname = info_res.get('properties').get('nickname')
+    # 카카오 로그인의 경우, 이메일이 없을 수 있다.
+    try:
+        email = info_res.get('kakao_account')  # 에러 발생 지점.
+    except:
+
+        # 이메일이 없는 경우, 임의의 이메일을 생성한다.
+        characters = string.ascii_letters + string.digits  # 알파벳 대/소문자와 숫자
+        random_string = ''.join(random.choice(characters) for _ in range(5))
+        email = f'{nickname + random_string}@kakao.com'
+
+
+    # 해당 이메일을 사용해 가입한 이력이 있는지, 확인한다.
 
     # 해당 이메일로 가입한 이력이 없다면, 새로운 유저를 생성한다.
     user = User.objects.filter(email=email)
@@ -85,7 +79,8 @@ def kakao_login_and_get_userinfo(request):
         new_user_point(user.id)  # 해당 유저의 포인트를 생성한다.
 
     # 로그인 처리
-    login_res = requests.post(url='http://127.0.0.1:8000/user/dj-rest-auth/login/', data={'email': email, 'password': 'Kakao_'+nickname + '977'})
+    # login_res = requests.post(url='http://127.0.0.1:8000/user/dj-rest-auth/login/', data={'email': email, 'password': 'Kakao_'+nickname + '977'})
+    login_res = requests.post(url='https://kickin.kr/user/dj-rest-auth/login/', data={'email': email, 'password': 'Kakao_'+nickname + '977'})
     pp(login_res)
     pp(login_res.json())
     login_res = login_res.json()
@@ -107,3 +102,33 @@ def kakao_login_and_get_userinfo(request):
 
     print(f'access_token: {access_token}')
     return Response(data=response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def kakao_test(request):
+    code = request.data.get('code')
+    headers = {
+        'Content-type': 'application/x-www-form-urlencoded',
+    }
+    body = {
+        'grant_type': 'authorization_code',
+        'client_id': 'dcf8cc38ec4e7ec39baf6207a53ed140',
+        'redirect_uri': 'http://localhost:8080/loading/',
+        'code': code,
+    }
+    response = requests.post(headers=headers, url='https://kauth.kakao.com/oauth/token', data=body)
+    pp(response.json())
+    access_token = response.json().get('access_token')
+
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+    }
+
+    info_request = requests.get(url='https://kapi.kakao.com/v2/user/me', headers=headers)
+    info_res = info_request.json()
+
+    pp(info_res)
+
+    return Response(data=info_res, status=status.HTTP_200_OK)

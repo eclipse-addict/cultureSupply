@@ -27,7 +27,8 @@ urlpatterns = [
     path('userinfo/<int:user_pk>/', views.get_update_create_userinfo),
 
     # kakao login
-    path('kakao/login/', social_views.kakao_login_and_get_userinfo),
+    # path('kakao/login/', social_views.kakao_login_and_get_userinfo),
+    path('kakao/login/', social_views.kakao_test),
 
 ]
 
