@@ -104,7 +104,7 @@ def kakao_login_and_get_userinfo(request):
     return Response(data=response_data, status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def kakao_test(request):
     code = request.data.get('code')
