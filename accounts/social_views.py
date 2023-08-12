@@ -114,7 +114,7 @@ def kakao_test(request):
     body = {
         'grant_type': 'authorization_code',
         'client_id': 'dcf8cc38ec4e7ec39baf6207a53ed140',
-        'redirect_uri': 'http://localhost:8080/loading/',
+        'redirect_uri': 'https://kickin.kr/loading/',
         'code': code,
     }
     response = requests.post(headers=headers, url='https://kauth.kakao.com/oauth/token', data=body)
