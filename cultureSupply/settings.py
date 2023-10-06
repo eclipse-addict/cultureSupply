@@ -167,21 +167,6 @@ AUTHENTICATION_BACKENDS = [
 WSGI_APPLICATION = 'cultureSupply.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-# psql -U postgres -d kickin_db -f dump_file.sql
-DATABASES = {
-    'default' : {
-       'ENGINE': 'django.db.backends.postgresql',
-       'NAME': 'kickin_db' ,
-       'USER': 'postgres' ,
-       'PASSWORD': '1234',
-       'HOST': 'localhost',
-       'PORT': '5432',
-    }
-}
-
-
 
 
 
