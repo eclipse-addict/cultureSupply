@@ -50,6 +50,6 @@
 
 <div align="center">
   <br>
-  Made by [isaac](#)
+  Made by isaac
 </div>
 
