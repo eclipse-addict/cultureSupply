@@ -49,8 +49,7 @@
 ---
 
 <div align="center">
-  <strong>킥인(Kickin)에서 최신 브랜드 출시 정보를 얻어보세요!</strong>
   <br>
-  Made with ❤️ by [Your Name or Team Name](#)
+  Made by [isaac](#)
 </div>
 
