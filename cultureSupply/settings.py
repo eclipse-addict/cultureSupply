@@ -181,41 +181,10 @@ DATABASES = {
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'djongo',
-#         'NAME': 'kickinDb',
-#         'HOST': 'localhost',
-#         'PORT': 27017,
-#     }
-# }
-
-# Redis RAM cache setting
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://127.0.0.1:6379/",
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         }
-#     }
-# }
-
-# DATABASES = {
-#     'default' : {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': 'kickindb' ,
-#        'USER': 'isaac' ,
-#        'PASSWORD': 'ghwn0524@',
-#        'HOST': 'localhost',
-#        'PORT': '5432',
-#     }
-# }
 
 
 
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -349,67 +318,6 @@ CRONJOBS = [
 ]
 
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'filters': {
-#         'require_debug_false': {
-#             '()': 'django.utils.log.RequireDebugFalse',
-#         },
-#         'require_debug_true': {
-#             '()': 'django.utils.log.RequireDebugTrue',
-#         },
-#     },
-#     'formatters': {
-#         'django.server': {
-#             '()': 'django.utils.log.ServerFormatter',
-#             'format': '[{server_time}] {message}',
-#             'style': '{',
-#         },
-#         'standard': {
-#             'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-#         },
-#     },
-#     'handlers': {
-#         'console': {
-#             'level': 'INFO',
-#             'filters': ['require_debug_true'],
-#             'class': 'logging.StreamHandler',
-#         },
-#         'django.server': {
-#             'level': 'INFO',  # 수정: DEBUG에서 INFO로 변경
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'django.server',
-#         },
-#         'mail_admins': {
-#             'level': 'ERROR',
-#             'filters': ['require_debug_false'],
-#             'class': 'django.utils.log.AdminEmailHandler'
-#         },
-#         'file': {
-#             'level': 'INFO',  # 수정: DEBUG에서 INFO로 변경
-#             'encoding': 'utf-8',
-#             'filters': ['require_debug_false'],
-#             'class': 'logging.handlers.RotatingFileHandler',
-#             'filename': BASE_DIR / 'logs/mysite.log',
-#             'maxBytes': 1024*1024*5,  # 5 MB
-#             'backupCount': 5,
-#             'formatter': 'standard',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console', 'mail_admins', 'file'],
-#             'level': 'INFO',
-#         },
-#         'django.server': {
-#             'handlers': ['django.server'],
-#             'level': 'INFO',
-#             'propagate': False,
-#         }
-#     }
-# }
-
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
@@ -427,17 +335,3 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = "smtp.isaacshin9292.synology.me"
-EMAIL_PORT = 25
-EMAIL_HOST_USER = 'kickin'
-EMAIL_HOST_PASSWORD = EMAIL_PASS
-EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = 'admin@kickin.kr'
-ACCOUNT_EMAIL_SUBJECT_PREFIX = '[Kickin.kr]'
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 10
-# ACCOUNT_EMAIL_CONFIRMATION_EMAIL_SUBJECT = '이메일 인증을 완료해주세요.'
-# ACCOUNT_EMAIL_CONFIRMATION_EMAIL = 'email/confirmation_email.html'
-URL_FRONT = 'https://kickin.kr/'
