@@ -1,6 +1,4 @@
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fisaacshin92%2FcultureSupply&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
-# cultureSupply
----
 <img src="https://img.shields.io/badge/Progress-50%25-lightgrey"/>
 <img src="https://img.shields.io/badge/Start%20Date-2022.08.09-blue"/>
 <img src="https://img.shields.io/badge/participant-1-brightgreen"/>
