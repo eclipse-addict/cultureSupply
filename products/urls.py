@@ -6,26 +6,23 @@ from .views import ProductListViewSet
 from django.conf import settings
 
 urlpatterns = [
-    path('sneaker/<int:prd_id>/', views.get_detail),
-    path('sneaker/like/<int:product_id>/<int:user_id>/', views.product_like),
-    path('sneaker/list/', ProductListViewSet.as_view()),
-    path('sneaker/recent/', views.recent_releases),
-    path('sneaker/likes/<int:user_pk>/', views.get_likes),
-
+    path("sneaker/<int:prd_id>/", views.get_detail),
+    path("sneaker/like/<int:product_id>/<int:user_id>/", views.product_like),
+    path("sneaker/list/", ProductListViewSet.as_view()),
+    path("sneaker/recent/", views.recent_releases),
+    path("sneaker/likes/<int:user_pk>/", views.get_likes),
     # data crawling activated request
-    path('goat/collections/', crawling_views.goat_collections),  # goat collections 데이터 크롤링 USING
-    path('kream/', crawling_views.kream_crawling),  # Kream 데이터 크롤링 USING
-
-
-
+    path(
+        "goat/collections/", crawling_views.goat_collections
+    ),  # goat collections 데이터 크롤링 USING
     # last data crawling
-    path('last/', views.get_last_updated),
+    path("last/", views.get_last_updated),
     # Achive request
     # path('sneaker/', views.get_sneaker),
     # path('new/', views.new_release_paser),
     # path('brand/', views.sneaker_data_by_brand_paser),
     # path('test/', views.google_img_download),
-    # path('img/pasing/', views.sneaker_img_paser), # 이미지 다운로더 
+    # path('img/pasing/', views.sneaker_img_paser), # 이미지 다운로더
     # path('goat/', views.get_goat),
     # path('dup/', views.duplicate_check),
     # path('imgmodel/', views.temp_img_fix),
@@ -34,5 +31,5 @@ urlpatterns = [
 ]
 if settings.DEBUG:
     urlpatterns += [
-    # path('dev/crawling/', crawling_views.dev_crawling_test),
+        # path('dev/crawling/', crawling_views.dev_crawling_test),
     ]
